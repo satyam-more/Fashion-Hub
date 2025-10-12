@@ -1,10 +1,7 @@
-PS D:\Projects> cd Fashion-Hub
-PS D:\Projects\Fashion-Hub> .\cleanup.ps1
-At D:\Projects\Fashion-Hub\cleanup.ps1:96 char:24
 
 - Write-Host "âš ï¸ Don't forget to:" -ForegroundColor Red
 -                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  The string is missing the terminator: '. + CategoryInfo : ParserError: (:) [], ParseException + FullyQualifiedErrorId : TerminatorExpectedAtEndOfString# 👗 Fashion Hub - E-Commerce Platform
+ 👗 Fashion Hub - E-Commerce Platform
 
 A full-stack e-commerce web application for fashion products built with React, Node.js, Express, and MySQL.
 
