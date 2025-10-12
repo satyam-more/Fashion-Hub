@@ -1,0 +1,63 @@
+/* Star Rating Component Styles */
+
+.star-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.star-rating .stars {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.star-rating .star {
+  transition: color 0.2s ease;
+  cursor: default;
+}
+
+.star-rating .star.filled {
+  color: #fbbf24;
+}
+
+.star-rating .star.empty {
+  color: #d1d5db;
+}
+
+.star-rating .rating-value {
+  margin-left: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Interactive Star Rating (for forms) */
+.star-rating.interactive .star {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.star-rating.interactive .star:hover {
+  transform: scale(1.1);
+}
+
+.star-rating.interactive .star.filled:hover {
+  color: #f59e0b;
+}
+
+.star-rating.interactive .star.empty:hover {
+  color: #fbbf24;
+}
+
+/* Different sizes */
+.star-rating.small .star {
+  font-size: 1rem;
+}
+
+.star-rating.medium .star {
+  font-size: 1.25rem;
+}
+
+.star-rating.large .star {
+  font-size: 1.5rem;
+}

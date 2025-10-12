@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fashion Hub - Where Tradition Meets Modern Fashion</title>
+    <meta name="description" content="Discover the latest fashion trends and exclusive collections at Fashion Hub. Premium clothing for men, women, and kids with Imperial Indian styling." />
+    <meta name="keywords" content="fashion, clothing, online shopping, Indian fashion, traditional wear, modern fashion" />
+    
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Google Fonts for better typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Variables for Imperial Indian Theme -->
+    <style>
+      :root {
+        /* Maratha Empire Colors */
+        --maratha-saffron: #FF8C00;
+        --maratha-deep-saffron: #FF6347;
+        --maratha-gold: #DAA520;
+        --maratha-deep-gold: #B8860B;
+        --maratha-royal-green: #006400;
+        
+        /* Rajput Colors */
+        --rajput-purple: #4B0082;
+        --rajput-royal-purple: #663399;
+        --rajput-magenta: #C71585;
+        --rajput-bright-gold: #FFD700;
+        --rajput-pink: #FF1493;
+        
+        /* Vijayanagara Empire Colors */
+        --vijayanagara-vermillion: #FF4500;
+        --vijayanagara-teal: #008B8B;
+        --vijayanagara-temple-gold: #B8860B;
+        --vijayanagara-copper: #B87333;
+        
+        /* Imperial Neutrals */
+        --imperial-cream: #FFFDD0;
+        --imperial-ivory: #FFF8DC;
+        --imperial-sandstone: #D2B48C;
+        --imperial-maroon: #800000;
+        --imperial-stone: #696969;
+        --imperial-charcoal: #2C2C2C;
+        
+        /* Typography */
+        --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --font-display: 'Playfair Display', Georgia, serif;
+        
+        /* Spacing */
+        --spacing-xs: 0.25rem;
+        --spacing-sm: 0.5rem;
+        --spacing-md: 1rem;
+        --spacing-lg: 1.5rem;
+        --spacing-xl: 2rem;
+        --spacing-2xl: 3rem;
+        
+        /* Border Radius */
+        --radius-sm: 4px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --radius-xl: 16px;
+        
+        /* Shadows */
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+        --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+      }
+      
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: var(--font-primary);
+        line-height: 1.6;
+        color: var(--imperial-charcoal);
+        background-color: var(--imperial-cream);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      
+      #root {
+        min-height: 100vh;
+      }
+      
+      /* Loading styles */
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 200px;
+        font-size: 1.1rem;
+        color: var(--imperial-stone);
+      }
+      
+      /* Utility classes */
+      .text-center { text-align: center; }
+      .text-left { text-align: left; }
+      .text-right { text-align: right; }
+      
+      .font-display { font-family: var(--font-display); }
+      
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

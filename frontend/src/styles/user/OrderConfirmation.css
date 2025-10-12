@@ -1,0 +1,526 @@
+/* Imperial Indian Color Scheme Variables */
+:root {
+  /* Maratha Empire Colors */
+  --maratha-saffron: #FF8C00;
+  --maratha-deep-saffron: #FF6347;
+  --maratha-gold: #DAA520;
+  --maratha-deep-gold: #B8860B;
+  --maratha-royal-green: #006400;
+  
+  /* Rajput Kingdom Colors */
+  --rajput-purple: #4B0082;
+  --rajput-royal-purple: #663399;
+  --rajput-magenta: #C71585;
+  --rajput-bright-gold: #FFD700;
+  --rajput-pink: #FF1493;
+  
+  /* Vijayanagara Heritage Colors */
+  --vijayanagara-vermillion: #FF4500;
+  --vijayanagara-teal: #008B8B;
+  --vijayanagara-temple-gold: #B8860B;
+  --vijayanagara-copper: #B87333;
+  
+  /* Imperial Neutrals */
+  --imperial-cream: #FFFDD0;
+  --imperial-ivory: #FFF8DC;
+  --imperial-sandstone: #D2B48C;
+  --imperial-maroon: #800000;
+  --imperial-stone: #696969;
+  --imperial-charcoal: #2C2C2C;
+}
+
+/* Order Confirmation Page */
+.order-confirmation-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, 
+    var(--imperial-cream) 0%, 
+    var(--imperial-ivory) 50%, 
+    var(--imperial-sandstone) 100%);
+}
+
+.confirmation-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Loading and Error States */
+.loading {
+  text-align: center;
+  padding: 4rem 2rem;
+  font-size: 1.2rem;
+  color: var(--imperial-stone);
+}
+
+.error-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--imperial-sandstone);
+}
+
+.error-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.error-state h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--maratha-deep-saffron);
+  margin: 0 0 0.5rem 0;
+}
+
+.error-state p {
+  color: var(--imperial-stone);
+  margin: 0 0 2rem 0;
+  font-size: 1.1rem;
+}
+
+/* Success Header */
+.confirmation-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--imperial-sandstone);
+}
+
+.success-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.confirmation-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--maratha-royal-green);
+  margin: 0 0 1rem 0;
+}
+
+.confirmation-header p {
+  font-size: 1.2rem;
+  color: var(--imperial-stone);
+  margin: 0;
+}
+
+/* Confirmation Content */
+.confirmation-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.order-info-section,
+.order-items-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Cards */
+.order-summary-card,
+.shipping-card,
+.items-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--imperial-sandstone);
+}
+
+.order-summary-card h2,
+.shipping-card h3,
+.items-card h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--maratha-deep-saffron);
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba(255, 140, 0, 0.1);
+}
+
+/* Order Details */
+.order-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 140, 0, 0.1);
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row .label {
+  color: var(--imperial-stone);
+  font-weight: 500;
+}
+
+.detail-row .value {
+  color: var(--imperial-charcoal);
+  font-weight: 600;
+}
+
+.status-badge {
+  background: var(--maratha-saffron);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Shipping Address */
+.address-display {
+  background: rgba(255, 140, 0, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 140, 0, 0.1);
+}
+
+.address-display p {
+  margin: 0 0 0.25rem 0;
+  color: var(--imperial-charcoal);
+  line-height: 1.4;
+}
+
+.address-display p:last-child {
+  margin-bottom: 0;
+}
+
+/* Order Items */
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.confirmation-item {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(255, 140, 0, 0.05);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 140, 0, 0.1);
+}
+
+.confirmation-item .item-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: linear-gradient(135deg, 
+    rgba(255, 140, 0, 0.1) 0%, 
+    rgba(218, 165, 32, 0.1) 100%);
+}
+
+.confirmation-item .item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, 
+    var(--maratha-saffron) 0%, 
+    var(--maratha-deep-saffron) 100%);
+  color: white;
+  font-size: 1.5rem;
+}
+
+.confirmation-item .item-details h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--imperial-charcoal);
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+}
+
+.confirmation-item .item-details p {
+  font-size: 0.85rem;
+  color: var(--imperial-stone);
+  margin: 0 0 0.25rem 0;
+}
+
+.confirmation-item .item-total {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--maratha-deep-saffron);
+  text-align: right;
+}
+
+/* Order Total Section */
+.order-total-section {
+  border-top: 2px solid rgba(255, 140, 0, 0.1);
+  padding-top: 1rem;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.total-row span:first-child {
+  color: var(--imperial-stone);
+}
+
+.total-row span:last-child {
+  font-weight: 600;
+  color: var(--imperial-charcoal);
+}
+
+.total-row.final-total {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--maratha-deep-saffron);
+  border-top: 2px solid var(--maratha-saffron);
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+}
+
+.total-row.final-total span {
+  color: var(--maratha-deep-saffron);
+}
+
+/* Action Buttons */
+.confirmation-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+.primary-btn,
+.secondary-btn {
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, 
+    var(--maratha-saffron) 0%, 
+    var(--maratha-deep-saffron) 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 140, 0, 0.4);
+}
+
+.secondary-btn {
+  background: transparent;
+  color: var(--maratha-deep-saffron);
+  border: 2px solid var(--maratha-saffron);
+}
+
+.secondary-btn:hover {
+  background: var(--maratha-saffron);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Next Steps */
+.next-steps {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--imperial-sandstone);
+}
+
+.next-steps h3 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--maratha-deep-saffron);
+  text-align: center;
+  margin: 0 0 2rem 0;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.step {
+  text-align: center;
+  padding: 1.5rem;
+  background: rgba(255, 140, 0, 0.05);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 140, 0, 0.1);
+}
+
+.step-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.step h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--imperial-charcoal);
+  margin: 0 0 0.75rem 0;
+}
+
+.step p {
+  color: var(--imperial-stone);
+  margin: 0;
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+/* Print Styles */
+@media print {
+  .confirmation-header,
+  .confirmation-actions,
+  .next-steps {
+    display: none;
+  }
+  
+  .confirmation-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .order-confirmation-page {
+    background: white;
+  }
+  
+  .order-summary-card,
+  .shipping-card,
+  .items-card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .confirmation-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .confirmation-container {
+    padding: 1rem;
+  }
+  
+  .confirmation-header {
+    padding: 2rem 1rem;
+  }
+  
+  .confirmation-header h1 {
+    font-size: 2rem;
+  }
+  
+  .order-summary-card,
+  .shipping-card,
+  .items-card {
+    padding: 1.5rem;
+  }
+  
+  .confirmation-item {
+    grid-template-columns: 60px 1fr;
+    grid-template-rows: auto auto;
+  }
+  
+  .confirmation-item .item-image {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .confirmation-item .item-total {
+    grid-column: 1 / -1;
+    text-align: left;
+    margin-top: 0.5rem;
+  }
+  
+  .confirmation-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .primary-btn,
+  .secondary-btn {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .confirmation-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .order-summary-card,
+  .shipping-card,
+  .items-card {
+    padding: 1rem;
+  }
+  
+  .next-steps {
+    padding: 2rem 1rem;
+  }
+  
+  .step {
+    padding: 1rem;
+  }
+}

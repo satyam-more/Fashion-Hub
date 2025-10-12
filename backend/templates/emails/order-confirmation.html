@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - Fashion Hub</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #d97706, #ea580c);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .order-summary {
+            background: #fef7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .detail-item {
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 6px;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #374151;
+            font-size: 0.9em;
+        }
+
+        .detail-value {
+            color: #d97706;
+            font-weight: bold;
+        }
+
+        .items-list {
+            margin: 25px 0;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: #fafafa;
+        }
+
+        .item-image {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #fef7ed, #fed7aa);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            margin-right: 15px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 5px;
+        }
+
+        .item-specs {
+            font-size: 0.9em;
+            color: #6b7280;
+        }
+
+        .item-price {
+            text-align: right;
+            font-weight: bold;
+            color: #d97706;
+        }
+
+        .shipping-address {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .total-section {
+            background: linear-gradient(135deg, #fef7ed, #fed7aa);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .total-amount {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #92400e;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #d97706, #ea580c);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin: 10px;
+        }
+
+        .timeline {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 10px;
+        }
+
+        .timeline-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #d97706;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 0.8em;
+        }
+
+        .timeline-icon.pending {
+            background: #6b7280;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            .order-details {
+                grid-template-columns: 1fr;
+            }
+
+            .item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .item-image {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✅ Order Confirmed!</h1>
+            <p>Thank you for your order, {{customerName}}</p>
+        </div>
+
+        <div class="content">
+            <div class="order-summary">
+                <h2 style="color: #d97706; margin-top: 0;">🎉 Your order has been successfully placed!</h2>
+                <p>We've received your order and will start processing it right away. You'll receive updates as we
+                    prepare your fashion items.</p>
+            </div>
+
+            <div class="order-details">
+                <div class="detail-item">
+                    <div class="detail-label">Order Number</div>
+                    <div class="detail-value">#{{orderId}}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Payment Method</div>
+                    <div class="detail-value">{{paymentMethod}}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Estimated Delivery</div>
+                    <div class="detail-value">{{estimatedDelivery}}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Order Status</div>
+                    <div class="detail-value">Processing</div>
+                </div>
+            </div>
+
+            <h3 style="color: #374151;">📦 Order Items</h3>
+            <div class="items-list">
+                {{#each items}}
+                <div class="item">
+                    <div class="item-image">
+                        {{#if image}}
+                        <img src="{{image}}" alt="{{product_name}}"
+                            style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div
+                            style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center; font-size: 1.5em;">
+                            👗</div>
+                        {{else}}
+                        👗
+                        {{/if}}
+                    </div>
+                    <div class="item-details">
+                        <div class="item-name">{{product_name}}</div>
+                        <div class="item-specs">
+                            Quantity: {{quantity}}
+                            {{#if size}} • Size: {{size}}{{/if}}
+                            {{#if color}} • Color: {{color}}{{/if}}
+                        </div>
+                    </div>
+                    <div class="item-price">₹{{price}}</div>
+                </div>
+                {{/each}}
+            </div>
+
+            <div class="total-section">
+                <h3 style="margin-top: 0; color: #92400e;">Total Amount</h3>
+                <div class="total-amount">₹{{totalAmount}}</div>
+                <p style="margin-bottom: 0; color: #78350f;">Including all taxes and fees</p>
+            </div>
+
+            <div class="shipping-address">
+                <h4 style="color: #92400e; margin-top: 0;">🚚 Shipping Address</h4>
+                <div style="white-space: pre-line; color: #78350f;">{{shippingAddress}}</div>
+            </div>
+
+            <div class="timeline">
+                <h4 style="color: #374151; margin-top: 0;">📋 Order Timeline</h4>
+                <div class="timeline-item">
+                    <div class="timeline-icon">✓</div>
+                    <div>
+                        <strong>Order Placed</strong><br>
+                        <small style="color: #6b7280;">Your order has been received and confirmed</small>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon pending">2</div>
+                    <div>
+                        <strong>Processing</strong><br>
+                        <small style="color: #6b7280;">We're preparing your fashion items</small>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon pending">3</div>
+                    <div>
+                        <strong>Quality Check</strong><br>
+                        <small style="color: #6b7280;">Final inspection and packaging</small>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon pending">4</div>
+                    <div>
+                        <strong>Shipped</strong><br>
+                        <small style="color: #6b7280;">Your order is on its way to you</small>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{orderUrl}}" class="btn">Track Your Order</a>
+                <p style="color: #6b7280; margin-top: 15px;">
+                    Questions about your order? Contact us at support@fashionhub.com
+                </p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>👗 Fashion Hub</strong> - Where Tradition Meets Modern Fashion</p>
+            <p>📧 support@fashionhub.com | 📞 +91-XXXXX-XXXXX</p>
+            <p style="font-size: 0.9em; margin-top: 20px;">
+                © 2024 Fashion Hub. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

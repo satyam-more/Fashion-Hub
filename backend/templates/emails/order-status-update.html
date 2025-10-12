@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Status Update - Fashion Hub</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #d97706, #ea580c);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+        .content {
+            padding: 30px;
+        }
+        .status-update {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        .order-info {
+            background: #fef7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .info-item {
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #374151;
+            font-size: 0.9em;
+        }
+        .info-value {
+            color: #d97706;
+            font-weight: bold;
+        }
+        .tracking-section {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #d97706, #ea580c);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin: 10px;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+        }
+        @media (max-width: 600px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📦 Order Update</h1>
+            <p>Your Fashion Hub order status has been updated</p>
+        </div>
+        
+        <div class="content">
+            <div class="status-update">
+                <h2 style="color: #059669; margin-top: 0;">Hi {{customerName}}! 👋</h2>
+                <p>Great news about your order!</p>
+                <div class="status-badge">{{status}}</div>
+                <p style="margin-top: 15px; font-size: 1.1em;">{{statusMessage}}</p>
+            </div>
+
+            <div class="order-info">
+                <h3 style="color: #d97706; margin-top: 0;">📋 Order Information</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Order Number</div>
+                        <div class="info-value">#{{orderId}}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Status</div>
+                        <div class="info-value">{{status}}</div>
+                    </div>
+                    {{#if trackingNumber}}
+                    <div class="info-item">
+                        <div class="info-label">Tracking Number</div>
+                        <div class="info-value">{{trackingNumber}}</div>
+                    </div>
+                    {{/if}}
+                    <div class="info-item">
+                        <div class="info-label">Updated On</div>
+                        <div class="info-value">{{updatedDate}}</div>
+                    </div>
+                </div>
+            </div>
+
+            {{#if trackingNumber}}
+            <div class="tracking-section">
+                <h4 style="color: #92400e; margin-top: 0;">🚚 Tracking Information</h4>
+                <p>Your order is now trackable with the following details:</p>
+                <p><strong>Tracking Number:</strong> {{trackingNumber}}</p>
+                <p>You can track your package using this number on our courier partner's website.</p>
+            </div>
+            {{/if}}
+
+            {{#if (eq status "processing")}}
+            <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                <h4 style="color: #0369a1; margin-top: 0;">⏳ What's Next?</h4>
+                <ul style="color: #0c4a6e;">
+                    <li>We're carefully preparing your fashion items</li>
+                    <li>Quality check and packaging in progress</li>
+                    <li>You'll receive shipping notification soon</li>
+                </ul>
+            </div>
+            {{/if}}
+
+            {{#if (eq status "shipped")}}
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                <h4 style="color: #059669; margin-top: 0;">🚀 On the Way!</h4>
+                <ul style="color: #065f46;">
+                    <li>Your package has left our facility</li>
+                    <li>Expected delivery in 2-5 business days</li>
+                    <li>You'll receive delivery updates via SMS</li>
+                </ul>
+            </div>
+            {{/if}}
+
+            {{#if (eq status "delivered")}}
+            <div style="background: #fef7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                <h4 style="color: #d97706; margin-top: 0;">🎉 Delivered Successfully!</h4>
+                <p style="color: #92400e;">We hope you love your new fashion items! If you have any questions or concerns, please don't hesitate to contact us.</p>
+                <p style="color: #92400e;"><strong>Enjoy your Fashion Hub experience!</strong></p>
+            </div>
+            {{/if}}
+
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{orderUrl}}" class="btn">View Order Details</a>
+                <p style="color: #6b7280; margin-top: 15px;">
+                    Need help? Contact us at support@fashionhub.com
+                </p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>👗 Fashion Hub</strong> - Where Tradition Meets Modern Fashion</p>
+            <p>📧 support@fashionhub.com | 📞 +91-XXXXX-XXXXX</p>
+            <p style="font-size: 0.9em; margin-top: 20px;">
+                © 2024 Fashion Hub. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
