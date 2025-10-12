@@ -1,6 +1,4 @@
 
-- Write-Host "âš ï¸ Don't forget to:" -ForegroundColor Red
--                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  👗 Fashion Hub - E-Commerce Platform
 
 A full-stack e-commerce web application for fashion products built with React, Node.js, Express, and MySQL.
