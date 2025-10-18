@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import ForgotPassword from "./components/ForgotPassword";
 import UserDashboard from "./components/user/UserDashboard";
 import Profile from "./components/user/Profile";
 import Orders from "./components/user/Orders";
@@ -40,6 +41,13 @@ function App() {
           <Route path="/register" element={
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
               <Register />
+            </div>
+          } />
+          
+          {/* Forgot Password Route */}
+          <Route path="/forgot-password" element={
+            <div className="min-h-screen flex items-center justify-center bg-gray-100">
+              <ForgotPassword />
             </div>
           } />
           

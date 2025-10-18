@@ -243,6 +243,60 @@ class EmailService {
     }
   }
 
+  // Send OTP email
+  async sendOTPEmail(userEmail, username, otp) {
+    try {
+      const emailData = {
+        username: username,
+        otp: otp,
+        expiryMinutes: 10
+      };
+
+      const htmlContent = this.loadTemplate('otp-login', emailData);
+
+      const mailOptions = {
+        from: `"Fashion Hub Security" <${process.env.EMAIL_USER || 'security@fashionhub.com'}>`,
+        to: userEmail,
+        subject: '🔐 Your OTP for Fashion Hub Login',
+        html: htmlContent
+      };
+
+      const result = await this.transporter.sendMail(mailOptions);
+      console.log('✅ OTP email sent successfully:', result.messageId);
+      return { success: true, messageId: result.messageId };
+    } catch (error) {
+      console.error('❌ Failed to send OTP email:', error.message);
+      return { success: false, error: error.message };
+    }
+  }
+
+  // Send Password Reset OTP email
+  async sendPasswordResetOTP(userEmail, username, otp) {
+    try {
+      const emailData = {
+        username: username,
+        otp: otp,
+        expiryMinutes: 10
+      };
+
+      const htmlContent = this.loadTemplate('password-reset', emailData);
+
+      const mailOptions = {
+        from: `"Fashion Hub Security" <${process.env.EMAIL_USER || 'security@fashionhub.com'}>`,
+        to: userEmail,
+        subject: '🔐 Password Reset Code - Fashion Hub',
+        html: htmlContent
+      };
+
+      const result = await this.transporter.sendMail(mailOptions);
+      console.log('✅ Password reset email sent successfully:', result.messageId);
+      return { success: true, messageId: result.messageId };
+    } catch (error) {
+      console.error('❌ Failed to send password reset email:', error.message);
+      return { success: false, error: error.message };
+    }
+  }
+
   // Test email service
   async testEmailService(testEmail) {
     try {

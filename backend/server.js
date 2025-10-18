@@ -44,6 +44,7 @@ const startServer = async () => {
     
     // Import routes and pass the connection
     const authRouter = require("./routes/auth")(con);
+    const otpRouter = require("./routes/otp")(con);
     const productRouter = require("./routes/products")(con);
     const uploadRouter = require("./routes/upload")();
     const cartRouter = require("./routes/cart")(con);
@@ -55,6 +56,7 @@ const startServer = async () => {
     const emailTestRouter = require("./routes/email-test")();
     
     app.use("/api/auth", authRouter);
+    app.use("/api/otp", otpRouter);
     app.use("/api/products", productRouter);
     app.use("/api/upload", uploadRouter);
     app.use("/api/cart", cartRouter);
