@@ -30,24 +30,15 @@ import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
     <Router>
-      <div className="min-h-screen">
-        <Routes>
+      <Routes>
           {/* User Dashboard Route - Entry Point (Public) */}
           <Route path="/" element={<UserDashboard />} />
           
           {/* Login Route */}
-          <Route path="/login" element={
-            <div className="min-h-screen flex items-center justify-center bg-gray-100">
-              <Login />
-            </div>
-          } />
+          <Route path="/login" element={<Login />} />
           
           {/* Registration Route */}
-          <Route path="/register" element={
-            <div className="min-h-screen flex items-center justify-center bg-gray-100">
-              <Register />
-            </div>
-          } />
+          <Route path="/register" element={<Register />} />
           
           {/* Forgot Password Route */}
           <Route path="/forgot-password" element={
@@ -198,7 +189,6 @@ function App() {
           {/* Catch all route - redirect to dashboard */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </div>
     </Router>
   );
 }
