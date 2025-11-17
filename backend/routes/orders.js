@@ -6,7 +6,7 @@ module.exports = (con) => {
   // Get user's orders
   router.get('/', auth.authenticateToken, async (req, res) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.user.userId || req.user.id;
       
       const [orders] = await con.execute(`
         SELECT 
@@ -57,7 +57,7 @@ module.exports = (con) => {
   // Get single order details
   router.get('/:orderId', auth.authenticateToken, async (req, res) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.user.userId || req.user.id;
       const { orderId } = req.params;
 
       const [orders] = await con.execute(`
@@ -97,6 +97,189 @@ module.exports = (con) => {
     } catch (error) {
       console.error('Get order error:', error);
       res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
+
+  // Create new order (direct POST to /orders)
+  router.post('/', auth.authenticateToken, async (req, res) => {
+    try {
+      const userId = req.user.userId || req.user.id;
+      const { 
+        shipping_address, 
+        payment_method, 
+        payment_status,
+        subtotal, 
+        tax, 
+        shipping_cost, 
+        total_amount,
+        items 
+      } = req.body;
+
+      if (!shipping_address) {
+        return res.status(400).json({ success: false, message: 'Shipping address is required' });
+      }
+
+      if (!items || items.length === 0) {
+        return res.status(400).json({ success: false, message: 'Order items are required' });
+      }
+
+      // Check stock availability
+      for (let item of items) {
+        const [stockCheck] = await con.execute(
+          'SELECT quantity as stock, product_name FROM products WHERE product_id = ?',
+          [item.product_id]
+        );
+        
+        if (stockCheck.length === 0) {
+          return res.status(400).json({ 
+            success: false, 
+            message: `Product not found: ${item.product_name || 'Unknown'}` 
+          });
+        }
+        
+        if (stockCheck[0].stock < item.quantity) {
+          return res.status(400).json({ 
+            success: false, 
+            message: `Insufficient stock for ${stockCheck[0].product_name}` 
+          });
+        }
+      }
+
+      // Generate order number
+      const orderNumber = 'FH' + Date.now() + Math.random().toString(36).substr(2, 5).toUpperCase();
+
+      // Start transaction
+      await con.beginTransaction();
+
+      try {
+        // Create order
+        const [orderResult] = await con.execute(`
+          INSERT INTO orders (
+            user_id, 
+            order_number, 
+            total_amount, 
+            shipping_address, 
+            payment_method,
+            payment_status,
+            subtotal,
+            tax,
+            shipping_cost,
+            status
+          )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+        `, [
+          userId,
+          orderNumber,
+          parseFloat(total_amount),
+          shipping_address,
+          payment_method || 'cod',
+          payment_status || 'pending',
+          parseFloat(subtotal) || 0,
+          parseFloat(tax) || 0,
+          parseFloat(shipping_cost) || 0
+        ]);
+
+        const orderId = orderResult.insertId;
+
+        // Create order items
+        for (let item of items) {
+          const itemTotal = parseFloat(item.price) * item.quantity;
+          
+          await con.execute(`
+            INSERT INTO order_items (
+              order_id, 
+              product_id, 
+              quantity, 
+              size, 
+              price, 
+              total
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+          `, [
+            orderId,
+            item.product_id,
+            item.quantity,
+            item.size || 'M',
+            parseFloat(item.price),
+            itemTotal
+          ]);
+
+          // Update product stock
+          await con.execute(
+            'UPDATE products SET quantity = quantity - ? WHERE product_id = ?',
+            [item.quantity, item.product_id]
+          );
+        }
+
+        // Send order confirmation email
+        if (process.env.EMAIL_ENABLED === 'true') {
+          try {
+            // Get user details for email
+            const [userDetails] = await con.execute(
+              'SELECT username, email FROM users WHERE id = ?',
+              [userId]
+            );
+
+            if (userDetails.length > 0) {
+              const user = userDetails[0];
+              const emailService = require('../services/emailService');
+              
+              // Get product names for items
+              const itemsWithNames = [];
+              for (let item of items) {
+                const [productDetails] = await con.execute(
+                  'SELECT product_name FROM products WHERE product_id = ?',
+                  [item.product_id]
+                );
+                
+                itemsWithNames.push({
+                  product_name: productDetails[0]?.product_name || 'Product',
+                  quantity: item.quantity,
+                  price: parseFloat(item.price).toLocaleString(),
+                  size: item.size || 'M',
+                  color: 'N/A',
+                  image: 'https://via.placeholder.com/300x300/d97706/ffffff?text=' + encodeURIComponent((productDetails[0]?.product_name || 'Product').substring(0, 10))
+                });
+              }
+              
+              await emailService.sendOrderConfirmationEmail({
+                customerName: user.username,
+                customerEmail: user.email,
+                orderId: orderNumber,
+                totalAmount: parseFloat(total_amount),
+                paymentMethod: payment_method === 'cod' ? 'Cash on Delivery' : 
+                              payment_method === 'upi' || payment_method === 'upi_direct' ? 'UPI Payment' : 
+                              payment_method || 'COD',
+                estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+                shippingAddress: shipping_address,
+                items: itemsWithNames
+              });
+              
+              console.log(`✅ Order confirmation email sent to ${user.email}`);
+            }
+          } catch (emailError) {
+            console.error('Failed to send order confirmation email:', emailError.message);
+            // Don't fail order creation if email fails
+          }
+        }
+
+        await con.commit();
+
+        res.json({
+          success: true,
+          message: 'Order created successfully',
+          data: {
+            order_id: orderId,
+            order_number: orderNumber
+          }
+        });
+      } catch (error) {
+        await con.rollback();
+        throw error;
+      }
+    } catch (error) {
+      console.error('Create order error:', error);
+      res.status(500).json({ success: false, message: 'Failed to create order' });
     }
   });
 

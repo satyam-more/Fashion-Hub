@@ -9,6 +9,8 @@ const AdminLayout = ({ children }) => {
 
   const navigationItems = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊', path: '/admin-dashboard' },
+    { id: 'appointments', label: 'Appointments', icon: '✂️', path: '/admin/appointments' },
+    { id: 'payments', label: 'Payment Verification', icon: '💳', path: '/admin/payments' },
     { id: 'products', label: 'Manage Products', icon: '📦', path: '/admin/products' },
     { id: 'users', label: 'Manage Users', icon: '👥', path: '/admin/users' },
     { id: 'orders', label: 'Manage Orders', icon: '🛒', path: '/admin/orders' },

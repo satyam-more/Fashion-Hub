@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+    .success-icon {
+      font-size: 60px;
+      margin-bottom: 10px;
+    }
+    .content {
+      padding: 30px;
+    }
+    .appointment-box {
+      background: #f7fafc;
+      border-left: 4px solid #d97706;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 5px;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+    .label {
+      font-weight: 600;
+      color: #4a5568;
+    }
+    .value {
+      color: #2d3748;
+    }
+    .services {
+      background: #fffbeb;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 15px 0;
+    }
+    .service-tag {
+      display: inline-block;
+      background: white;
+      border: 1px solid #fbbf24;
+      padding: 5px 12px;
+      margin: 5px;
+      border-radius: 15px;
+      font-size: 14px;
+    }
+    .steps {
+      margin: 30px 0;
+    }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      margin: 15px 0;
+    }
+    .step-number {
+      background: #d97706;
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+    .button {
+      display: inline-block;
+      background: linear-gradient(135deg, #d97706, #ea580c);
+      color: white;
+      padding: 12px 30px;
+      text-decoration: none;
+      border-radius: 5px;
+      margin: 20px 0;
+      font-weight: 600;
+    }
+    .footer {
+      background: #f7fafc;
+      padding: 20px;
+      text-align: center;
+      color: #718096;
+      font-size: 14px;
+    }
+    .contact-info {
+      background: #fffbeb;
+      padding: 20px;
+      text-align: center;
+      border-top: 1px solid #fde68a;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="success-icon">✓</div>
+      <h1>Appointment Confirmed!</h1>
+      <p>Your custom tailoring consultation is booked</p>
+    </div>
+
+    <div class="content">
+      <p>Dear {{customerName}},</p>
+      
+      <p>Thank you for booking a custom tailoring consultation with Fashion Hub! We're excited to help you create your perfect garments.</p>
+
+      <div class="appointment-box">
+        <h3 style="margin-top: 0;">📋 Appointment Details</h3>
+        <div class="detail-row">
+          <span class="label">Appointment ID:</span>
+          <span class="value">#{{appointmentId}}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Date:</span>
+          <span class="value">{{appointmentDate}}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Time:</span>
+          <span class="value">{{timeSlot}}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Consultation Fee:</span>
+          <span class="value">₹{{consultationFee}}</span>
+        </div>
+      </div>
+
+      <div class="services">
+        <h3 style="margin-top: 0;">👗 Services Selected:</h3>
+        {{servicesList}}
+        <p style="margin-top: 10px;"><strong>Total Items:</strong> {{numberOfItems}}</p>
+      </div>
+
+      <div class="appointment-box">
+        <h3 style="margin-top: 0;">📍 Visit Address:</h3>
+        <p>{{fullAddress}}</p>
+        {{#if landmark}}<p>Landmark: {{landmark}}</p>{{/if}}
+        <p>{{city}}, {{pincode}}</p>
+        <p>Floor: {{buildingFloor}}</p>
+      </div>
+
+      <div class="steps">
+        <h3>📌 What Happens Next?</h3>
+        
+        <div class="step">
+          <div class="step-number">1</div>
+          <div>
+            <strong>Representative Visit</strong>
+            <p>Our expert will visit you at the scheduled time for measurements</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-number">2</div>
+          <div>
+            <strong>Design Discussion</strong>
+            <p>Discuss your requirements, fabric, and design preferences</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-number">3</div>
+          <div>
+            <strong>Order Placement</strong>
+            <p>Finalize your order and we'll start crafting your custom garments</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-number">4</div>
+          <div>
+            <strong>Delivery</strong>
+            <p>Receive your perfectly tailored garments in 10-15 days</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center;">
+        <a href="{{confirmationLink}}" class="button">View Appointment Details</a>
+      </div>
+
+      <div class="contact-info">
+        <h4 style="margin-top: 0;">Need to make changes?</h4>
+        <p>📞 Phone: +91 1234567890</p>
+        <p>📧 Email: support@fashionhub.com</p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Thank you for choosing Fashion Hub!</p>
+      <p>© 2025 Fashion Hub. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>

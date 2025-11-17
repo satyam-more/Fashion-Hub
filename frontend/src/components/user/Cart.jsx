@@ -178,24 +178,18 @@ const Cart = () => {
                     <span>₹{total}</span>
                   </div>
                   <div className="summary-row">
-                    <span>Tax (GST 18%)</span>
-                    <span>₹{(parseFloat(total) * 0.18).toFixed(2)}</span>
-                  </div>
-                  <div className="summary-row">
                     <span>Shipping</span>
-                    <span>{parseFloat(total) > 1000 ? 'Free' : '₹99'}</span>
+                    <span>FREE</span>
                   </div>
                   <div className="summary-row total">
                     <span>Total</span>
-                    <span>₹{(parseFloat(total) + (parseFloat(total) * 0.18) + (parseFloat(total) > 1000 ? 0 : 99)).toFixed(2)}</span>
+                    <span>₹{total}</span>
                   </div>
                   <button className="checkout-btn" onClick={proceedToCheckout}>
                     Proceed to Checkout
                   </button>
                   <p className="shipping-info">
-                    {parseFloat(total) <= 1000 && (
-                      <span>Add ₹{(1000 - parseFloat(total)).toFixed(2)} more for free shipping</span>
-                    )}
+                    <span>🎉 Free shipping on all orders!</span>
                   </p>
                 </div>
               </div>

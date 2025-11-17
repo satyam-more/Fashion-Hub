@@ -9,6 +9,9 @@ import Orders from "./components/user/Orders";
 import Cart from "./components/user/Cart";
 import Checkout from "./components/user/Checkout";
 import OrderConfirmation from "./components/user/OrderConfirmation";
+import CustomTailoring from "./components/user/CustomTailoring";
+import Membership from "./components/user/Membership";
+import AppointmentConfirmation from "./components/user/AppointmentConfirmation";
 import SearchResults from "./components/SearchResults";
 import ProductDetail from "./components/ProductDetail";
 import AboutUs from "./components/AboutUs";
@@ -19,7 +22,9 @@ import Users from "./components/admin/Users";
 import AdminOrders from "./components/admin/Orders";
 import Reviews from "./components/admin/Reviews";
 import Settings from "./components/admin/Settings";
-import Analytics from "./components/admin/Analytics";
+import Analytics from "./components/admin/AnalyticsEnhanced";
+import PaymentVerification from "./components/admin/PaymentVerification";
+import Appointments from "./components/admin/Appointments";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -76,6 +81,27 @@ function App() {
           <Route path="/cart" element={
             <ProtectedRoute allowedRoles={['user', 'admin']}>
               <Cart />
+            </ProtectedRoute>
+          } />
+          
+          {/* Custom Tailoring Route */}
+          <Route path="/custom-tailoring" element={
+            <ProtectedRoute allowedRoles={['user', 'admin']}>
+              <CustomTailoring />
+            </ProtectedRoute>
+          } />
+          
+          {/* Membership Route */}
+          <Route path="/membership" element={
+            <ProtectedRoute allowedRoles={['user', 'admin']}>
+              <Membership />
+            </ProtectedRoute>
+          } />
+          
+          {/* Appointment Confirmation Route */}
+          <Route path="/appointment-confirmation/:appointmentId" element={
+            <ProtectedRoute allowedRoles={['user', 'admin']}>
+              <AppointmentConfirmation />
             </ProtectedRoute>
           } />
           
@@ -152,6 +178,20 @@ function App() {
           <Route path="/admin/analytics" element={
             <ProtectedRoute allowedRoles={['admin']}>
               <Analytics />
+            </ProtectedRoute>
+          } />
+          
+          {/* Admin Payment Verification Route */}
+          <Route path="/admin/payments" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <PaymentVerification />
+            </ProtectedRoute>
+          } />
+          
+          {/* Admin Appointments Management Route */}
+          <Route path="/admin/appointments" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <Appointments />
             </ProtectedRoute>
           } />
           

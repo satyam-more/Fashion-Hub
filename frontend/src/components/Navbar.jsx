@@ -10,6 +10,7 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState({});
+  const [isPremium, setIsPremium] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,6 +20,8 @@ const Navbar = () => {
     fetchCounts();
     // Fetch categories and subcategories
     fetchCategories();
+    // Check membership status
+    checkMembership();
   }, []);
 
   const checkAuthStatus = () => {
@@ -87,6 +90,26 @@ const Navbar = () => {
 
   const handleMouseLeave = () => {
     setActiveDropdown(null);
+  };
+
+  const checkMembership = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+
+      const response = await fetch('http://localhost:5000/api/memberships/check-status', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data.is_premium) {
+          setIsPremium(true);
+        }
+      }
+    } catch (error) {
+      console.error('Check membership error:', error);
+    }
   };
 
   const fetchCategories = async () => {
@@ -172,8 +195,9 @@ const Navbar = () => {
                 onMouseLeave={handleMouseLeave}
               >
                 <button className="navbar-profile-icon">
-                  <div className="navbar-avatar">
+                  <div className={`navbar-avatar ${isPremium ? 'premium-avatar' : ''}`}>
                     {user.username?.charAt(0).toUpperCase()}
+                    {isPremium && <span className="premium-crown">👑</span>}
                   </div>
                 </button>
 
@@ -248,6 +272,13 @@ const Navbar = () => {
                 )}
               </div>
             ))}
+            
+            {/* Custom Tailoring Link */}
+            <div className="navbar-nav-item">
+              <Link to="/custom-tailoring" className="navbar-nav-link custom-tailoring-link">
+                ✂️ Custom Tailoring
+              </Link>
+            </div>
           </div>
         </div>
       </div>

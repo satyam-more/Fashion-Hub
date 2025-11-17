@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import Navbar from '../Navbar';
+import UPIPayment from './UPIPayment';
 import '../../styles/user/Checkout.css';
 
 const Checkout = () => {
@@ -24,35 +26,41 @@ const Checkout = () => {
     country: 'India'
   });
 
-  const [paymentMethod, setPaymentMethod] = useState('cod');
   const [errors, setErrors] = useState({});
+  const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [showUPIPayment, setShowUPIPayment] = useState(false);
+  const [pendingOrderId, setPendingOrderId] = useState(null);
+
+  const API_BASE_URL = 'http://localhost:5000/api';
 
   useEffect(() => {
     fetchCartItems();
     loadUserProfile();
   }, []);
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('authToken');
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+  };
+
   const fetchCartItems = async () => {
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/cart', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const response = await axios.get(`${API_BASE_URL}/cart`, {
+        headers: getAuthHeaders()
       });
       
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setCartItems(data.items);
-          const subtotal = parseFloat(data.total);
-          const calculatedTax = subtotal * 0.18; // 18% GST
-          const calculatedShipping = subtotal > 1000 ? 0 : 99; // Free shipping above ₹1000
-          
-          setTotal(data.total);
-          setTax(calculatedTax);
-          setShippingCost(calculatedShipping);
-        }
+      if (response.data.success) {
+        setCartItems(response.data.items);
+        const subtotal = parseFloat(response.data.total);
+        const calculatedTax = 0; // No GST - prices are final MRP after discount
+        const calculatedShipping = 0; // Free shipping for all orders
+        
+        setTax(calculatedTax);
+        setShippingCost(calculatedShipping);
+        setTotal(subtotal.toFixed(2)); // Total = Subtotal (no tax, no shipping)
       }
     } catch (error) {
       console.error('Error fetching cart:', error);
@@ -63,30 +71,23 @@ const Checkout = () => {
 
   const loadUserProfile = async () => {
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/profile', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const response = await axios.get(`${API_BASE_URL}/profile`, {
+        headers: getAuthHeaders()
       });
       
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.profile) {
-          const profile = data.profile;
-          setShippingAddress(prev => ({
-            ...prev,
-            firstName: profile.first_name || '',
-            lastName: profile.last_name || '',
-            email: profile.email || '',
-            phone: profile.phone || '',
-            address: profile.address || '',
-            city: profile.city || '',
-            state: profile.state || '',
-            postalCode: profile.postal_code || '',
-            country: profile.country || 'India'
-          }));
-        }
+      if (response.data.success && response.data.data) {
+        const profile = response.data.data;
+        setShippingAddress(prev => ({
+          ...prev,
+          firstName: profile.first_name || '',
+          lastName: profile.last_name || '',
+          email: profile.email || '',
+          phone: profile.phone || '',
+          address: profile.address || '',
+          city: profile.city || '',
+          state: profile.state || '',
+          postalCode: profile.postal_code || ''
+        }));
       }
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -100,7 +101,6 @@ const Checkout = () => {
       [name]: value
     }));
     
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -115,55 +115,18 @@ const Checkout = () => {
     if (!shippingAddress.firstName.trim()) newErrors.firstName = 'First name is required';
     if (!shippingAddress.lastName.trim()) newErrors.lastName = 'Last name is required';
     if (!shippingAddress.email.trim()) newErrors.email = 'Email is required';
-    if (!shippingAddress.phone.trim()) newErrors.phone = 'Phone number is required';
+    if (!shippingAddress.phone.trim()) newErrors.phone = 'Phone is required';
     if (!shippingAddress.address.trim()) newErrors.address = 'Address is required';
     if (!shippingAddress.city.trim()) newErrors.city = 'City is required';
     if (!shippingAddress.state.trim()) newErrors.state = 'State is required';
     if (!shippingAddress.postalCode.trim()) newErrors.postalCode = 'Postal code is required';
     
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (shippingAddress.email && !emailRegex.test(shippingAddress.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-    
-    // Phone validation
-    const phoneRegex = /^[6-9]\d{9}$/;
-    if (shippingAddress.phone && !phoneRegex.test(shippingAddress.phone)) {
-      newErrors.phone = 'Please enter a valid 10-digit phone number';
-    }
-    
-    // Postal code validation
-    const postalRegex = /^\d{6}$/;
-    if (shippingAddress.postalCode && !postalRegex.test(shippingAddress.postalCode)) {
-      newErrors.postalCode = 'Please enter a valid 6-digit postal code';
-    }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const calculateFinalTotal = () => {
-    const subtotal = parseFloat(total);
-    return (subtotal + tax + shippingCost).toFixed(2);
-  };
-
-  const handlePlaceOrder = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-    
-    if (cartItems.length === 0) {
-      alert('Your cart is empty');
-      return;
-    }
-    
-    setProcessing(true);
-    
+  const createOrder = async (paymentStatus = 'pending') => {
     try {
-      const token = localStorage.getItem('authToken');
       const orderData = {
         items: cartItems.map(item => ({
           product_id: item.product_id,
@@ -171,220 +134,278 @@ const Checkout = () => {
           size: item.size,
           price: item.price
         })),
-        shipping_address: `${shippingAddress.firstName} ${shippingAddress.lastName}\n${shippingAddress.address}\n${shippingAddress.city}, ${shippingAddress.state} ${shippingAddress.postalCode}\n${shippingAddress.country}\nPhone: ${shippingAddress.phone}\nEmail: ${shippingAddress.email}`,
+        shipping_address: `${shippingAddress.address}, ${shippingAddress.city}, ${shippingAddress.state} - ${shippingAddress.postalCode}, ${shippingAddress.country}`,
         payment_method: paymentMethod,
+        payment_status: paymentStatus,
+        total_amount: parseFloat(total),
         subtotal: parseFloat(total),
-        tax: tax,
-        shipping_cost: shippingCost,
-        total_amount: parseFloat(calculateFinalTotal())
+        tax: 0,
+        shipping_cost: 0
       };
-      
-      const response = await fetch('http://localhost:5000/api/orders/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(orderData)
-      });
-      
-      const data = await response.json();
-      
-      if (response.ok && data.success) {
-        // Clear cart after successful order
-        await fetch('http://localhost:5000/api/cart/clear', {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+
+      const response = await axios.post(
+        `${API_BASE_URL}/orders`,
+        orderData,
+        { headers: getAuthHeaders() }
+      );
+
+      if (response.data.success) {
+        // For UPI payment, show UPI payment modal
+        if (paymentMethod === 'upi') {
+          setPendingOrderId(response.data.data.order_id);
+          setShowUPIPayment(true);
+          setProcessing(false);
+          return;
+        }
+
+        // For COD, clear cart and navigate
+        await axios.delete(`${API_BASE_URL}/cart/clear`, {
+          headers: getAuthHeaders()
         });
-        
-        // Redirect to order confirmation
-        navigate(`/order-confirmation/${data.order.order_id}`, {
-          state: { orderData: data.order }
-        });
+
+        navigate(`/order-confirmation/${response.data.data.order_id}`);
       } else {
-        alert(data.message || 'Failed to place order. Please try again.');
+        throw new Error('Failed to create order');
       }
     } catch (error) {
-      console.error('Error placing order:', error);
+      console.error('Create order error:', error);
+      alert('Failed to create order. Please contact support.');
+      setProcessing(false);
+    }
+  };
+
+  const handleUPIPaymentSuccess = async (paymentData) => {
+    try {
+      // Clear cart
+      await axios.delete(`${API_BASE_URL}/cart/clear`, {
+        headers: getAuthHeaders()
+      });
+
+      // Navigate to order confirmation
+      navigate(`/order-confirmation/${pendingOrderId}`);
+    } catch (error) {
+      console.error('Error after UPI payment:', error);
+      navigate(`/order-confirmation/${pendingOrderId}`);
+    }
+  };
+
+  const handleUPIPaymentCancel = () => {
+    setShowUPIPayment(false);
+    setPendingOrderId(null);
+    setProcessing(false);
+  };
+
+  const handlePlaceOrder = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    if (cartItems.length === 0) {
+      alert('Your cart is empty');
+      return;
+    }
+
+    setProcessing(true);
+
+    try {
+      if (paymentMethod === 'upi') {
+        await createOrder('payment_pending');
+      } else {
+        await createOrder('pending');
+      }
+    } catch (error) {
+      console.error('Place order error:', error);
       alert('Failed to place order. Please try again.');
-    } finally {
       setProcessing(false);
     }
   };
 
   if (loading) {
     return (
-      <div className="checkout-page">
+      <div>
         <Navbar />
-        <div className="checkout-container">
-          <div className="loading">Loading checkout...</div>
-        </div>
+        <div className="loading">Loading checkout...</div>
       </div>
     );
   }
 
-  if (cartItems.length === 0) {
+  // Show UPI Payment modal if needed
+  if (showUPIPayment && pendingOrderId) {
     return (
-      <div className="checkout-page">
+      <div>
         <Navbar />
         <div className="checkout-container">
-          <div className="empty-state">
-            <div className="empty-icon">🛒</div>
-            <h3>Your cart is empty</h3>
-            <p>Add some items to your cart before checkout</p>
-            <button className="primary-btn" onClick={() => navigate('/')}>
-              Continue Shopping
-            </button>
-          </div>
+          <UPIPayment
+            orderId={pendingOrderId}
+            amount={total}
+            onSuccess={handleUPIPaymentSuccess}
+            onCancel={handleUPIPaymentCancel}
+          />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="checkout-page">
+    <div>
       <Navbar />
       <div className="checkout-container">
-        <div className="checkout-header">
-          <h1>Checkout</h1>
-          <p>Complete your order</p>
-        </div>
+        <h1>Checkout</h1>
         
-        <form onSubmit={handlePlaceOrder} className="checkout-form">
-          <div className="checkout-content">
-            {/* Shipping Address */}
-            <div className="checkout-section">
-              <h2>Shipping Address</h2>
-              <div className="address-form">
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="firstName">First Name *</label>
-                    <input
-                      type="text"
-                      id="firstName"
-                      name="firstName"
-                      value={shippingAddress.firstName}
-                      onChange={handleInputChange}
-                      className={errors.firstName ? 'error' : ''}
-                    />
-                    {errors.firstName && <span className="error-message">{errors.firstName}</span>}
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="lastName">Last Name *</label>
-                    <input
-                      type="text"
-                      id="lastName"
-                      name="lastName"
-                      value={shippingAddress.lastName}
-                      onChange={handleInputChange}
-                      className={errors.lastName ? 'error' : ''}
-                    />
-                    {errors.lastName && <span className="error-message">{errors.lastName}</span>}
-                  </div>
-                </div>
-                
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="email">Email *</label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={shippingAddress.email}
-                      onChange={handleInputChange}
-                      className={errors.email ? 'error' : ''}
-                    />
-                    {errors.email && <span className="error-message">{errors.email}</span>}
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="phone">Phone Number *</label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={shippingAddress.phone}
-                      onChange={handleInputChange}
-                      className={errors.phone ? 'error' : ''}
-                      placeholder="10-digit mobile number"
-                    />
-                    {errors.phone && <span className="error-message">{errors.phone}</span>}
-                  </div>
+        <div className="checkout-content">
+          {/* Shipping Address Form */}
+          <div className="checkout-form">
+            <h2>Shipping Address</h2>
+            <form onSubmit={handlePlaceOrder}>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>First Name *</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={shippingAddress.firstName}
+                    onChange={handleInputChange}
+                    className={errors.firstName ? 'error' : ''}
+                  />
+                  {errors.firstName && <span className="error-text">{errors.firstName}</span>}
                 </div>
                 
                 <div className="form-group">
-                  <label htmlFor="address">Address *</label>
-                  <textarea
-                    id="address"
-                    name="address"
-                    value={shippingAddress.address}
+                  <label>Last Name *</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={shippingAddress.lastName}
                     onChange={handleInputChange}
-                    className={errors.address ? 'error' : ''}
-                    rows="3"
-                    placeholder="House number, street name, area"
+                    className={errors.lastName ? 'error' : ''}
                   />
-                  {errors.address && <span className="error-message">{errors.address}</span>}
-                </div>
-                
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="city">City *</label>
-                    <input
-                      type="text"
-                      id="city"
-                      name="city"
-                      value={shippingAddress.city}
-                      onChange={handleInputChange}
-                      className={errors.city ? 'error' : ''}
-                    />
-                    {errors.city && <span className="error-message">{errors.city}</span>}
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="state">State *</label>
-                    <input
-                      type="text"
-                      id="state"
-                      name="state"
-                      value={shippingAddress.state}
-                      onChange={handleInputChange}
-                      className={errors.state ? 'error' : ''}
-                    />
-                    {errors.state && <span className="error-message">{errors.state}</span>}
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="postalCode">Postal Code *</label>
-                    <input
-                      type="text"
-                      id="postalCode"
-                      name="postalCode"
-                      value={shippingAddress.postalCode}
-                      onChange={handleInputChange}
-                      className={errors.postalCode ? 'error' : ''}
-                      placeholder="6-digit PIN code"
-                    />
-                    {errors.postalCode && <span className="error-message">{errors.postalCode}</span>}
-                  </div>
+                  {errors.lastName && <span className="error-text">{errors.lastName}</span>}
                 </div>
               </div>
-            </div>
-            
-            {/* Payment Method */}
-            <div className="checkout-section">
-              <h2>Payment Method</h2>
-              <div className="payment-methods">
-                <div className="payment-option">
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Email *</label>
                   <input
-                    type="radio"
-                    id="cod"
-                    name="paymentMethod"
-                    value="cod"
-                    checked={paymentMethod === 'cod'}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    type="email"
+                    name="email"
+                    value={shippingAddress.email}
+                    onChange={handleInputChange}
+                    className={errors.email ? 'error' : ''}
                   />
-                  <label htmlFor="cod">
-                    <div className="payment-info">
-                      <span className="payment-icon">💰</span>
+                  {errors.email && <span className="error-text">{errors.email}</span>}
+                </div>
+                
+                <div className="form-group">
+                  <label>Phone *</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={shippingAddress.phone}
+                    onChange={handleInputChange}
+                    className={errors.phone ? 'error' : ''}
+                  />
+                  {errors.phone && <span className="error-text">{errors.phone}</span>}
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Address *</label>
+                <textarea
+                  name="address"
+                  value={shippingAddress.address}
+                  onChange={handleInputChange}
+                  rows="3"
+                  className={errors.address ? 'error' : ''}
+                />
+                {errors.address && <span className="error-text">{errors.address}</span>}
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>City *</label>
+                  <input
+                    type="text"
+                    name="city"
+                    value={shippingAddress.city}
+                    onChange={handleInputChange}
+                    className={errors.city ? 'error' : ''}
+                  />
+                  {errors.city && <span className="error-text">{errors.city}</span>}
+                </div>
+                
+                <div className="form-group">
+                  <label>State *</label>
+                  <input
+                    type="text"
+                    name="state"
+                    value={shippingAddress.state}
+                    onChange={handleInputChange}
+                    className={errors.state ? 'error' : ''}
+                  />
+                  {errors.state && <span className="error-text">{errors.state}</span>}
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Postal Code *</label>
+                  <input
+                    type="text"
+                    name="postalCode"
+                    value={shippingAddress.postalCode}
+                    onChange={handleInputChange}
+                    className={errors.postalCode ? 'error' : ''}
+                  />
+                  {errors.postalCode && <span className="error-text">{errors.postalCode}</span>}
+                </div>
+                
+                <div className="form-group">
+                  <label>Country</label>
+                  <input
+                    type="text"
+                    name="country"
+                    value={shippingAddress.country}
+                    onChange={handleInputChange}
+                    readOnly
+                  />
+                </div>
+              </div>
+
+              {/* Payment Method */}
+              <div className="payment-method-section">
+                <h2>Payment Method</h2>
+                <div className="payment-options">
+                  <label className={`payment-option ${paymentMethod === 'upi' ? 'active' : ''}`}>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="upi"
+                      checked={paymentMethod === 'upi'}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                    />
+                    <div className="payment-option-content">
+                      <span className="payment-icon">📱</span>
+                      <div>
+                        <strong>UPI Payment</strong>
+                        <p>Pay instantly with Google Pay, PhonePe, Paytm</p>
+                      </div>
+                    </div>
+                  </label>
+
+                  <label className={`payment-option ${paymentMethod === 'cod' ? 'active' : ''}`}>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="cod"
+                      checked={paymentMethod === 'cod'}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                    />
+                    <div className="payment-option-content">
+                      <span className="payment-icon">💵</span>
                       <div>
                         <strong>Cash on Delivery</strong>
                         <p>Pay when you receive your order</p>
@@ -392,116 +413,58 @@ const Checkout = () => {
                     </div>
                   </label>
                 </div>
-                
-                <div className="payment-option">
-                  <input
-                    type="radio"
-                    id="upi"
-                    name="paymentMethod"
-                    value="upi"
-                    checked={paymentMethod === 'upi'}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  />
-                  <label htmlFor="upi">
-                    <div className="payment-info">
-                      <span className="payment-icon">📱</span>
-                      <div>
-                        <strong>UPI Payment</strong>
-                        <p>Pay instantly using UPI apps</p>
-                      </div>
-                    </div>
-                  </label>
-                </div>
-                
-                <div className="payment-option">
-                  <input
-                    type="radio"
-                    id="card"
-                    name="paymentMethod"
-                    value="card"
-                    checked={paymentMethod === 'card'}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  />
-                  <label htmlFor="card">
-                    <div className="payment-info">
-                      <span className="payment-icon">💳</span>
-                      <div>
-                        <strong>Credit/Debit Card</strong>
-                        <p>Secure payment with your card</p>
-                      </div>
-                    </div>
-                  </label>
-                </div>
               </div>
-            </div>
-          </div>
-          
-          {/* Order Summary */}
-          <div className="order-summary">
-            <div className="summary-card">
-              <h3>Order Summary</h3>
-              
-              <div className="order-items">
-                {cartItems.map((item) => (
-                  <div key={item.cart_id} className="summary-item">
-                    <div className="item-image">
-                      {item.images && item.images.length > 0 ? (
-                        <img 
-                          src={item.images[0].startsWith('http') ? item.images[0] : `http://localhost:5000/uploads/${item.images[0]}`} 
-                          alt={item.product_name}
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                          }}
-                        />
-                      ) : null}
-                      <div 
-                        className="placeholder-image" 
-                        style={{
-                          display: (item.images && item.images.length > 0) ? 'none' : 'flex'
-                        }}
-                      >
-                        📷
-                      </div>
-                    </div>
-                    <div className="item-info">
-                      <h4>{item.product_name}</h4>
-                      <p>Qty: {item.quantity} {item.size && `• Size: ${item.size}`}</p>
-                    </div>
-                    <div className="item-price">₹{item.total}</div>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="summary-calculations">
-                <div className="summary-row">
-                  <span>Subtotal ({cartItems.length} items)</span>
-                  <span>₹{total}</span>
-                </div>
-                <div className="summary-row">
-                  <span>Tax (GST 18%)</span>
-                  <span>₹{tax.toFixed(2)}</span>
-                </div>
-                <div className="summary-row">
-                  <span>Shipping</span>
-                  <span>{shippingCost === 0 ? 'Free' : `₹${shippingCost}`}</span>
-                </div>
-                <div className="summary-row total">
-                  <span>Total</span>
-                  <span>₹{calculateFinalTotal()}</span>
-                </div>
-              </div>
-              
+
               <button 
                 type="submit" 
                 className="place-order-btn"
                 disabled={processing}
               >
-                {processing ? 'Processing...' : `Place Order • ₹${calculateFinalTotal()}`}
+                {processing ? 'Processing...' : `Place Order - ₹${total}`}
               </button>
-            </div>
+            </form>
           </div>
-        </form>
+
+          {/* Order Summary */}
+          <div className="order-summary">
+            <h2>Order Summary</h2>
+            
+            <div className="summary-items">
+              {cartItems.map((item, index) => (
+                <div key={index} className="summary-item">
+                  <div className="item-details">
+                    <h4>{item.product_name}</h4>
+                    <p>Size: {item.size} | Qty: {item.quantity}</p>
+                  </div>
+                  <div className="item-price">
+                    ₹{(item.price * item.quantity).toFixed(2)}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="summary-totals">
+              <div className="summary-row">
+                <span>Subtotal:</span>
+                <span>₹{total}</span>
+              </div>
+              <div className="summary-row">
+                <span>Shipping:</span>
+                <span>FREE</span>
+              </div>
+              <div className="summary-row total">
+                <span>Total:</span>
+                <span>₹{total}</span>
+              </div>
+            </div>
+
+            {shippingCost === 0 && (
+              <div className="free-shipping-badge">
+                🎉 You got FREE shipping!
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

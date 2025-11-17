@@ -1,0 +1,353 @@
+.upi-payment-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.upi-loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+  color: #666;
+}
+
+.upi-payment-step h2,
+.upi-confirmation-step h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.upi-instruction,
+.confirmation-instruction {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+/* UPI Info Card */
+.upi-info-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.upi-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.upi-info-row:last-child {
+  margin-bottom: 0;
+}
+
+.upi-label {
+  font-weight: 600;
+  color: #495057;
+}
+
+.upi-value {
+  font-weight: 500;
+  color: #212529;
+}
+
+.upi-value.amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #28a745;
+}
+
+.upi-value-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.copy-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.copy-btn:hover {
+  background: #0056b3;
+}
+
+/* UPI Apps Section */
+.upi-apps-section {
+  margin-bottom: 30px;
+}
+
+.upi-apps-section h3 {
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 18px;
+}
+
+.upi-apps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 15px;
+}
+
+.upi-app-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px 10px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  color: #333;
+}
+
+.upi-app-btn:hover {
+  border-color: #007bff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.app-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.upi-app-btn span:last-child {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* QR Code Section */
+.upi-qr-section {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.upi-qr-section h3 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.qr-code-placeholder {
+  display: flex;
+  justify-content: center;
+}
+
+.qr-code-box {
+  width: 150px;
+  height: 150px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+}
+
+.qr-code-box p {
+  margin: 0;
+  font-weight: 600;
+  color: #666;
+}
+
+.qr-code-box small {
+  color: #999;
+  margin-top: 5px;
+}
+
+.qr-code-image {
+  width: 150px;
+  height: 150px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+}
+
+/* Manual Payment Section */
+.upi-manual-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.upi-manual-section h3 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.manual-payment-details {
+  margin: 15px 0;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.manual-pay-btn {
+  width: 100%;
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.manual-pay-btn:hover {
+  background: #218838;
+}
+
+/* Actions */
+.upi-actions {
+  text-align: center;
+}
+
+.cancel-btn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancel-btn:hover {
+  background: #545b62;
+}
+
+/* Confirmation Step */
+.payment-summary {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.summary-row:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.transaction-input {
+  margin-bottom: 30px;
+}
+
+.transaction-input label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.transaction-input input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: border-color 0.2s;
+}
+
+.transaction-input input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.transaction-input small {
+  display: block;
+  margin-top: 5px;
+  color: #666;
+  font-size: 12px;
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.back-btn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.back-btn:hover {
+  background: #545b62;
+}
+
+.confirm-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-weight: 600;
+}
+
+.confirm-btn:hover:not(:disabled) {
+  background: #218838;
+}
+
+.confirm-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .upi-payment-container {
+    margin: 10px;
+    padding: 15px;
+  }
+
+  .upi-apps-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .confirmation-actions {
+    flex-direction: column;
+  }
+
+  .back-btn,
+  .confirm-btn {
+    width: 100%;
+  }
+}

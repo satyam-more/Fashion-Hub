@@ -185,6 +185,27 @@
   font-size: 16px;
   color: white;
   box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
+  position: relative;
+}
+
+.navbar-avatar.premium-avatar {
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  color: #2d3748;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
+}
+
+.premium-crown {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 16px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  animation: crownFloat 2s ease-in-out infinite;
+}
+
+@keyframes crownFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
 }
 
 .navbar-profile-dropdown {

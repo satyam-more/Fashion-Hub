@@ -11,9 +11,9 @@ const Settings = () => {
     contactPhone: '+91-XXXXX-XXXXX',
     address: 'Mumbai, Maharashtra, India',
     currency: 'INR',
-    taxRate: 18,
-    shippingCost: 50,
-    freeShippingThreshold: 1000,
+    taxRate: 0,
+    shippingCost: 0,
+    freeShippingThreshold: 0,
     emailNotifications: true,
     smsNotifications: false,
     maintenanceMode: false

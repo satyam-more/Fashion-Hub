@@ -10,7 +10,7 @@ const app = express();
 app.use(cors({
   origin: process.env.FRONTEND_URL || "http://localhost:5173",
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
@@ -54,6 +54,9 @@ const startServer = async () => {
     const reviewsRouter = require("./routes/reviews")(con);
     const adminRouter = require("./routes/admin");
     const emailTestRouter = require("./routes/email-test")();
+    const upiRouter = require("./routes/upi")(con);
+    const customRouter = require("./routes/custom");
+    const membershipsRouter = require("./routes/memberships");
     
     app.use("/api/auth", authRouter);
     app.use("/api/otp", otpRouter);
@@ -66,6 +69,9 @@ const startServer = async () => {
     app.use("/api/reviews", reviewsRouter);
     app.use("/api/admin", adminRouter);
     app.use("/api/email", emailTestRouter);
+    app.use("/api/upi", upiRouter);
+    app.use("/api/custom", customRouter);
+    app.use("/api/memberships", membershipsRouter);
 
     
     const PORT = process.env.PORT || 5000;

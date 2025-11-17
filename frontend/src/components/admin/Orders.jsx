@@ -57,20 +57,44 @@ const Orders = () => {
   };
 
   const updateOrderStatus = async (orderId, newStatus) => {
+    console.log('🔄 Updating order status:', { orderId, newStatus });
+    
     try {
+      setError(null);
+      setSuccess(null);
+      
+      console.log('📡 Sending request to:', `${API_BASE_URL}/admin/orders/${orderId}/status`);
+      
       const response = await axios.patch(
         `${API_BASE_URL}/admin/orders/${orderId}/status`,
         { status: newStatus },
         { headers: getAuthHeaders() }
       );
 
+      console.log('✅ Response received:', response.data);
+
       if (response.data.success) {
-        setSuccess(`Order status updated to ${newStatus}`);
-        fetchOrders();
+        setSuccess(`Order #${orderId} status updated to ${newStatus}`);
+        
+        // Update the order in the local state immediately for instant feedback
+        setOrders(prevOrders => 
+          prevOrders.map(order => 
+            order.order_id === orderId 
+              ? { ...order, status: newStatus }
+              : order
+          )
+        );
+        
+        console.log('✅ Local state updated');
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => setSuccess(null), 3000);
       }
     } catch (err) {
-      console.error('Update status error:', err);
-      setError('Failed to update order status');
+      console.error('❌ Update status error:', err);
+      console.error('❌ Error response:', err.response?.data);
+      setError(err.response?.data?.error || 'Failed to update order status');
+      setTimeout(() => setError(null), 5000);
     }
   };
 
@@ -297,7 +321,10 @@ const Orders = () => {
                     <select
                       className={`status-select ${getStatusColor(order.status)}`}
                       value={order.status}
-                      onChange={(e) => updateOrderStatus(order.order_id, e.target.value)}
+                      onChange={(e) => {
+                        console.log('🎯 Dropdown changed!', e.target.value);
+                        updateOrderStatus(order.order_id, e.target.value);
+                      }}
                     >
                       <option value="pending">Pending</option>
                       <option value="processing">Processing</option>
