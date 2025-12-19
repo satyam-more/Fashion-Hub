@@ -1,4 +1,3 @@
-import React from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import '../styles/components/AboutUs.css';
@@ -11,7 +10,7 @@ const AboutUs = () => {
       role: 'Founder & CEO',
       description: 'Visionary leader with a passion for fashion and technology. Satyam founded Fashion Hub with the mission to make quality fashion accessible to everyone.',
       expertise: ['Strategic Planning', 'Business Development', 'Fashion Industry', 'Leadership'],
-      avatar: '👨‍💼',
+      initials: 'SM',
       color: '#d97706'
     },
     {
@@ -20,7 +19,7 @@ const AboutUs = () => {
       role: 'Chief Technology Officer',
       description: 'Tech enthusiast and full-stack developer who brings innovative solutions to life. Siddharth leads our technical team and ensures seamless user experiences.',
       expertise: ['Full-Stack Development', 'System Architecture', 'Database Design', 'DevOps'],
-      avatar: '👨‍💻',
+      initials: 'SM',
       color: '#059669'
     },
     {
@@ -29,7 +28,7 @@ const AboutUs = () => {
       role: 'Head of Operations',
       description: 'Operations expert who ensures smooth business processes and exceptional customer service. Tukaram manages our supply chain and logistics operations.',
       expertise: ['Operations Management', 'Supply Chain', 'Quality Assurance', 'Customer Relations'],
-      avatar: '👨‍🔧',
+      initials: 'TJ',
       color: '#7c3aed'
     }
   ];
@@ -37,7 +36,7 @@ const AboutUs = () => {
   const companyStats = [
     { number: '10K+', label: 'Happy Customers' },
     { number: '500+', label: 'Products' },
-    { number: '50+', label: 'Brands' },
+    { number: '50+', label: 'Categories' },
     { number: '24/7', label: 'Support' }
   ];
 
@@ -73,7 +72,7 @@ const AboutUs = () => {
           <div className="about-hero-content">
             <h1 className="about-title">About Fashion Hub</h1>
             <p className="about-subtitle">
-              Where tradition meets modern elegance. We're passionate about bringing you the finest fashion 
+              Where tradition meets modern elegance. We're passionate about bringing you the finest fashion
               that celebrates both timeless classics and contemporary trends.
             </p>
           </div>
@@ -86,13 +85,13 @@ const AboutUs = () => {
               <div className="story-text">
                 <h2>Our Story</h2>
                 <p>
-                  Fashion Hub was born from a simple yet powerful vision: to make quality fashion accessible 
-                  to everyone. Founded in 2024, we started as a small team with big dreams and an unwavering 
+                  Fashion Hub was born from a simple yet powerful vision: to make quality fashion accessible
+                  to everyone. Founded in 2025, we started as a small team with big dreams and an unwavering
                   commitment to excellence.
                 </p>
                 <p>
-                  Today, we've grown into a trusted fashion destination, serving thousands of customers across 
-                  the country. Our journey is driven by innovation, quality, and most importantly, our customers' 
+                  Today, we've grown into a trusted fashion destination, serving thousands of customers across
+                  the country. Our journey is driven by innovation, quality, and most importantly, our customers'
                   trust and satisfaction.
                 </p>
               </div>
@@ -127,22 +126,22 @@ const AboutUs = () => {
               <h2>Meet Our Team</h2>
               <p>The passionate individuals behind Fashion Hub's success</p>
             </div>
-            
+
             <div className="team-grid">
               {teamMembers.map((member) => (
                 <div key={member.id} className="team-card">
                   <div className="team-avatar" style={{ backgroundColor: member.color }}>
-                    <span className="avatar-icon">{member.avatar}</span>
+                    <span className="avatar-icon">{member.initials}</span>
                   </div>
                   <div className="team-info">
                     <h3 className="team-name">{member.name}</h3>
-                    <p className="team-role" style={{ color: member.color }}>{member.role}</p>
+                    <p className="team-role">{member.role}</p>
                     <p className="team-description">{member.description}</p>
                     <div className="team-expertise">
                       <h4>Expertise:</h4>
                       <div className="expertise-tags">
                         {member.expertise.map((skill, index) => (
-                          <span key={index} className="expertise-tag" style={{ borderColor: member.color }}>
+                          <span key={index} className="expertise-tag">
                             {skill}
                           </span>
                         ))}
@@ -162,7 +161,7 @@ const AboutUs = () => {
               <h2>Our Values</h2>
               <p>The principles that guide everything we do</p>
             </div>
-            
+
             <div className="values-grid">
               {values.map((value, index) => (
                 <div key={index} className="value-card">
@@ -182,7 +181,7 @@ const AboutUs = () => {
               <div className="mission-text">
                 <h2>Our Mission</h2>
                 <p>
-                  To democratize fashion by providing high-quality, trendy, and affordable clothing 
+                  To democratize fashion by providing high-quality, trendy, and affordable clothing
                   that empowers individuals to express their unique style and personality.
                 </p>
                 <div className="mission-points">

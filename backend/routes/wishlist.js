@@ -7,40 +7,44 @@ module.exports = (con) => {
   router.get('/', auth.authenticateToken, async (req, res) => {
     try {
       const userId = req.user.userId;
-      
-      const [wishlistItems] = await con.execute(`
+
+      const [items] = await con.execute(`
         SELECT 
           w.wishlist_id,
           w.added_at,
           p.product_id,
           p.product_name,
           p.price,
-          p.images,
-          p.colour,
           p.discount,
-          cat.name as category_name,
-          sub.name as subcategory_name
+          p.images,
+          p.quantity,
+          c.name as category_name,
+          s.name as subcategory_name
         FROM wishlist w
         JOIN products p ON w.product_id = p.product_id
-        JOIN categories cat ON p.category_id = cat.category_id
-        JOIN subcategories sub ON p.subcategory_id = sub.subcategory_id
+        LEFT JOIN categories c ON p.category_id = c.category_id
+        LEFT JOIN subcategories s ON p.subcategory_id = s.subcategory_id
         WHERE w.user_id = ?
         ORDER BY w.added_at DESC
       `, [userId]);
 
-      // Parse images for each item
-      const formattedItems = wishlistItems.map(item => ({
-        ...item,
+      const processedItems = items.map(item => ({
+        wishlistId: item.wishlist_id,
+        productId: item.product_id,
+        name: item.product_name,
+        price: parseFloat(item.price),
+        discount: parseFloat(item.discount) || 0,
         images: item.images ? JSON.parse(item.images) : [],
-        discounted_price: item.discount ? 
-          (parseFloat(item.price) * (1 - parseFloat(item.discount) / 100)).toFixed(2) : 
-          item.price
+        inStock: item.quantity > 0,
+        category: item.category_name,
+        subcategory: item.subcategory_name,
+        addedAt: item.added_at
       }));
 
       res.json({
         success: true,
-        items: formattedItems,
-        count: formattedItems.length
+        data: processedItems,
+        total: processedItems.length
       });
     } catch (error) {
       console.error('Get wishlist error:', error);
@@ -52,39 +56,39 @@ module.exports = (con) => {
   router.post('/add', auth.authenticateToken, async (req, res) => {
     try {
       const userId = req.user.userId;
-      const { productId } = req.body;
+      const { product_id } = req.body;
 
-      if (!productId) {
-        return res.status(400).json({ success: false, message: 'Product ID is required' });
+      if (!product_id) {
+        return res.status(400).json({ success: false, error: 'Product ID is required' });
       }
 
       // Check if product exists
-      const [product] = await con.execute(
-        'SELECT product_id FROM products WHERE product_id = ?',
-        [productId]
-      );
-
-      if (product.length === 0) {
-        return res.status(404).json({ success: false, message: 'Product not found' });
+      const [products] = await con.execute('SELECT product_id FROM products WHERE product_id = ?', [product_id]);
+      if (products.length === 0) {
+        return res.status(404).json({ success: false, error: 'Product not found' });
       }
 
-      // Check if item already exists in wishlist
-      const [existingItem] = await con.execute(
+      // Check if already in wishlist
+      const [existing] = await con.execute(
         'SELECT wishlist_id FROM wishlist WHERE user_id = ? AND product_id = ?',
-        [userId, productId]
+        [userId, product_id]
       );
 
-      if (existingItem.length > 0) {
-        return res.status(400).json({ success: false, message: 'Item already in wishlist' });
+      if (existing.length > 0) {
+        return res.json({ success: true, message: 'Product already in wishlist', alreadyExists: true });
       }
 
       // Add to wishlist
-      await con.execute(
+      const [result] = await con.execute(
         'INSERT INTO wishlist (user_id, product_id) VALUES (?, ?)',
-        [userId, productId]
+        [userId, product_id]
       );
 
-      res.json({ success: true, message: 'Item added to wishlist' });
+      res.status(201).json({
+        success: true,
+        message: 'Product added to wishlist',
+        data: { wishlistId: result.insertId, productId: product_id }
+      });
     } catch (error) {
       console.error('Add to wishlist error:', error);
       res.status(500).json({ success: false, message: 'Server error' });
@@ -92,23 +96,22 @@ module.exports = (con) => {
   });
 
   // Remove item from wishlist
-  router.delete('/remove/:wishlistId', auth.authenticateToken, async (req, res) => {
+  router.delete('/:wishlistId', auth.authenticateToken, async (req, res) => {
     try {
       const userId = req.user.userId;
       const { wishlistId } = req.params;
 
-      // Verify wishlist item belongs to user
-      const [wishlistItem] = await con.execute(
+      // Verify ownership
+      const [items] = await con.execute(
         'SELECT wishlist_id FROM wishlist WHERE wishlist_id = ? AND user_id = ?',
         [wishlistId, userId]
       );
 
-      if (wishlistItem.length === 0) {
-        return res.status(404).json({ success: false, message: 'Wishlist item not found' });
+      if (items.length === 0) {
+        return res.status(404).json({ success: false, error: 'Wishlist item not found' });
       }
 
       await con.execute('DELETE FROM wishlist WHERE wishlist_id = ?', [wishlistId]);
-
       res.json({ success: true, message: 'Item removed from wishlist' });
     } catch (error) {
       console.error('Remove from wishlist error:', error);
@@ -116,59 +119,16 @@ module.exports = (con) => {
     }
   });
 
-  // Remove by product ID (alternative endpoint)
-  router.delete('/remove-product/:productId', auth.authenticateToken, async (req, res) => {
+  // Remove by product ID
+  router.delete('/product/:productId', auth.authenticateToken, async (req, res) => {
     try {
       const userId = req.user.userId;
       const { productId } = req.params;
 
-      const result = await con.execute(
-        'DELETE FROM wishlist WHERE user_id = ? AND product_id = ?',
-        [userId, productId]
-      );
-
-      if (result[0].affectedRows === 0) {
-        return res.status(404).json({ success: false, message: 'Item not found in wishlist' });
-      }
-
+      await con.execute('DELETE FROM wishlist WHERE user_id = ? AND product_id = ?', [userId, productId]);
       res.json({ success: true, message: 'Item removed from wishlist' });
     } catch (error) {
       console.error('Remove from wishlist error:', error);
-      res.status(500).json({ success: false, message: 'Server error' });
-    }
-  });
-
-  // Check if product is in wishlist
-  router.get('/check/:productId', auth.authenticateToken, async (req, res) => {
-    try {
-      const userId = req.user.userId;
-      const { productId } = req.params;
-
-      const [wishlistItem] = await con.execute(
-        'SELECT wishlist_id FROM wishlist WHERE user_id = ? AND product_id = ?',
-        [userId, productId]
-      );
-
-      res.json({
-        success: true,
-        inWishlist: wishlistItem.length > 0
-      });
-    } catch (error) {
-      console.error('Check wishlist error:', error);
-      res.status(500).json({ success: false, message: 'Server error' });
-    }
-  });
-
-  // Clear entire wishlist
-  router.delete('/clear', auth.authenticateToken, async (req, res) => {
-    try {
-      const userId = req.user.userId;
-
-      await con.execute('DELETE FROM wishlist WHERE user_id = ?', [userId]);
-
-      res.json({ success: true, message: 'Wishlist cleared' });
-    } catch (error) {
-      console.error('Clear wishlist error:', error);
       res.status(500).json({ success: false, message: 'Server error' });
     }
   });

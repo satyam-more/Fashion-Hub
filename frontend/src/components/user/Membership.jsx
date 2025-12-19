@@ -315,19 +315,20 @@ const Membership = () => {
                 <div className="payment-method">
                   <h4>UPI Payment</h4>
                   <p>Scan QR code or use UPI ID</p>
-                  <div className="upi-details">
-                    <p><strong>UPI ID:</strong> fashionhub@upi</p>
-                    <p><strong>Amount:</strong> ₹1,000</p>
+                  
+                  <div className="qr-code-container">
+                    <img 
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`upi://pay?pa=9021679551@nyes&pn=Fashion%20Hub&am=1000&cu=INR&tn=Premium%20Membership`)}`}
+                      alt="UPI QR Code"
+                      className="qr-code"
+                    />
+                    <p className="qr-instruction">Scan with any UPI app</p>
                   </div>
-                </div>
-
-                <div className="payment-method">
-                  <h4>Bank Transfer</h4>
-                  <p>Transfer to our account</p>
-                  <div className="bank-details">
-                    <p><strong>Account Name:</strong> Fashion Hub</p>
-                    <p><strong>Account Number:</strong> 1234567890</p>
-                    <p><strong>IFSC Code:</strong> SBIN0001234</p>
+                  
+                  <div className="upi-details">
+                    <p><strong>UPI ID:</strong> 9021679551@nyes</p>
+                    <p><strong>Amount:</strong> ₹1,000</p>
+                    <p><strong>Note:</strong> Premium Membership</p>
                   </div>
                 </div>
               </div>

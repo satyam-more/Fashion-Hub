@@ -12,7 +12,21 @@ const Register = () => {
   });
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
   const navigate = useNavigate();
+
+  // Calculate password strength
+  const calculatePasswordStrength = (password) => {
+    let strength = 0;
+    if (password.length >= 6) strength++;
+    if (password.length >= 10) strength++;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[^a-zA-Z\d]/.test(password)) strength++;
+    return strength;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,10 +84,23 @@ const Register = () => {
   };
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
+    
+    // Update password strength when password changes
+    if (name === 'password') {
+      setPasswordStrength(calculatePasswordStrength(value));
+    }
+  };
+
+  const getPasswordStrengthLabel = () => {
+    if (passwordStrength === 0) return { text: '', color: '' };
+    if (passwordStrength <= 2) return { text: 'Weak', color: '#ef4444' };
+    if (passwordStrength <= 3) return { text: 'Medium', color: '#f59e0b' };
+    return { text: 'Strong', color: '#10b981' };
   };
 
   return (
@@ -92,7 +119,7 @@ const Register = () => {
             transition={{ delay: 0.3, duration: 0.8 }}
           >
             <h1 className="auth-brand-title">Fashion Hub</h1>
-            <p className="auth-brand-tagline">Discover your style, define your essence</p>
+            <p className="auth-brand-tagline">Where trends meet personality</p>
           </motion.div>
         </div>
       </motion.div>
@@ -157,36 +184,90 @@ const Register = () => {
 
             <div className="form-group">
               <label htmlFor="password" className="form-label">Password</label>
-              <motion.input
-                whileFocus={{ scale: 1.01 }}
-                transition={{ duration: 0.2 }}
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="form-input"
-                placeholder="••••••••"
-                required
-                disabled={isLoading}
-              />
+              <div className="password-input-wrapper">
+                <motion.input
+                  whileFocus={{ scale: 1.01 }}
+                  transition={{ duration: 0.2 }}
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="••••••••"
+                  required
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
+                >
+                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                </button>
+              </div>
+              {formData.password && (
+                <motion.div 
+                  className="password-strength"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="strength-bar">
+                    <div 
+                      className="strength-fill" 
+                      style={{ 
+                        width: `${(passwordStrength / 5) * 100}%`,
+                        background: getPasswordStrengthLabel().color
+                      }}
+                    />
+                  </div>
+                  <span 
+                    className="strength-label" 
+                    style={{ color: getPasswordStrengthLabel().color }}
+                  >
+                    {getPasswordStrengthLabel().text}
+                  </span>
+                </motion.div>
+              )}
             </div>
 
             <div className="form-group">
               <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
-              <motion.input
-                whileFocus={{ scale: 1.01 }}
-                transition={{ duration: 0.2 }}
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="form-input"
-                placeholder="••••••••"
-                required
-                disabled={isLoading}
-              />
+              <div className="password-input-wrapper">
+                <motion.input
+                  whileFocus={{ scale: 1.01 }}
+                  transition={{ duration: 0.2 }}
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="••••••••"
+                  required
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  disabled={isLoading}
+                >
+                  {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+                </button>
+              </div>
+              {formData.confirmPassword && (
+                <motion.p 
+                  className={`password-match ${formData.password === formData.confirmPassword ? 'match' : 'no-match'}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {formData.password === formData.confirmPassword ? '✓ Passwords match' : '✗ Passwords do not match'}
+                </motion.p>
+              )}
             </div>
 
             {message && (

@@ -8,7 +8,7 @@ module.exports = (connection) => {
   router.get('/details', (req, res) => {
     try {
       const upiDetails = {
-        upiId: '88053091@ybl',
+        upiId: '9021679551@nyes',
         merchantName: 'Fashion Hub',
         qrCodeUrl: null // Will be generated dynamically
       };
@@ -38,11 +38,11 @@ module.exports = (connection) => {
         });
       }
 
-      const upiId = '88053091@ybl';
+      const upiId = '9021679551@nyes';
       const merchantName = 'Fashion Hub';
-      const transactionNote = `Payment for Order #${orderId}`;
+      const transactionNote = `Order${orderId}`;
 
-      // Generate UPI Intent URL
+      // Generate UPI Intent URL with amount
       const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
 
       // Generate different app-specific URLs

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminLayout from './AdminLayout';
 import '../../styles/admin/Reviews.css';
+import '../../styles/admin/ExportButton.css';
+import { exportReviewsReport } from '../../utils/pdfExport';
 
 const Reviews = () => {
   const [reviews, setReviews] = useState([]);
@@ -148,9 +150,20 @@ const Reviews = () => {
         <div className="reviews-header">
           <h2>Customer Reviews</h2>
           <div className="header-actions">
-            <button className="export-btn">
-              <span className="icon">📊</span>
-              Export Reviews
+            <button 
+              className="export-btn"
+              onClick={() => {
+                const stats = {
+                  totalReviews: reviews.length,
+                  pending: reviews.filter(r => r.status === 'pending').length,
+                  approved: reviews.filter(r => r.status === 'approved').length,
+                  avgRating: reviews.length > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length) : 0
+                };
+                exportReviewsReport(filteredReviews, stats);
+              }}
+            >
+              <span className="icon">📄</span>
+              Export PDF
             </button>
           </div>
         </div>

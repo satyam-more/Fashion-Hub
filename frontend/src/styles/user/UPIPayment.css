@@ -71,7 +71,7 @@
 }
 
 .copy-btn {
-  background: #007bff;
+  background: #d97706;
   color: white;
   border: none;
   padding: 5px 10px;
@@ -82,7 +82,7 @@
 }
 
 .copy-btn:hover {
-  background: #0056b3;
+  background: #b45309;
 }
 
 /* UPI Apps Section */
@@ -117,9 +117,9 @@
 }
 
 .upi-app-btn:hover {
-  border-color: #007bff;
+  border-color: #d97706;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(217, 119, 6, 0.2);
 }
 
 .app-icon {
@@ -205,18 +205,21 @@
 
 .manual-pay-btn {
   width: 100%;
-  background: #28a745;
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
   color: white;
   border: none;
   padding: 12px;
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
 }
 
 .manual-pay-btn:hover {
-  background: #218838;
+  background: linear-gradient(135deg, #b45309 0%, #d97706 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
 }
 
 /* Actions */
@@ -281,7 +284,8 @@
 
 .transaction-input input:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: #d97706;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
 }
 
 .transaction-input small {
@@ -312,23 +316,27 @@
 }
 
 .confirm-btn {
-  background: #28a745;
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
   color: white;
   border: none;
   padding: 12px 24px;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
   font-weight: 600;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
 }
 
 .confirm-btn:hover:not(:disabled) {
-  background: #218838;
+  background: linear-gradient(135deg, #b45309 0%, #d97706 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
 }
 
 .confirm-btn:disabled {
   background: #ccc;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* Mobile Responsive */

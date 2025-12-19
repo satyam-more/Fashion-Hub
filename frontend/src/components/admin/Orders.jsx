@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminLayout from './AdminLayout';
 import '../../styles/admin/Orders.css';
+import '../../styles/admin/ExportButton.css';
+import { exportOrdersReport } from '../../utils/pdfExport';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -200,9 +202,12 @@ const Orders = () => {
       <div className="orders-header">
         <h2>Manage Orders</h2>
         <div className="header-actions">
-          <button className="export-btn">
-            <span className="icon">📊</span>
-            Export Orders
+          <button 
+            className="export-btn"
+            onClick={() => exportOrdersReport(filteredOrders, stats)}
+          >
+            <span className="icon">📄</span>
+            Export PDF
           </button>
         </div>
       </div>

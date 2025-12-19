@@ -18,6 +18,7 @@ const ProductDetail = () => {
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [showFullImage, setShowFullImage] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -123,7 +124,7 @@ const ProductDetail = () => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          productId: product.id
+          product_id: product.id
         })
       });
 
@@ -231,13 +232,16 @@ const ProductDetail = () => {
         <div className="product-detail-content">
           {/* Left Side - Images */}
           <div className="product-images-section">
-            <div className="main-image-container">
+            <div className="main-image-container" onClick={() => setShowFullImage(true)}>
               {product.images && product.images.length > 0 ? (
-                <img
-                  src={product.images[selectedImage]}
-                  alt={product.name}
-                  className="main-product-image"
-                />
+                <>
+                  <img
+                    src={product.images[selectedImage]}
+                    alt={product.name}
+                    className="main-product-image"
+                  />
+                  <div className="zoom-hint">🔍 Click to view full image</div>
+                </>
               ) : (
                 <div className="no-image-placeholder">
                   <span>📷</span>
@@ -260,6 +264,39 @@ const ProductDetail = () => {
               </div>
             )}
           </div>
+
+          {/* Full Screen Image Modal */}
+          {showFullImage && (
+            <div className="fullscreen-modal" onClick={() => setShowFullImage(false)}>
+              <div className="fullscreen-content" onClick={(e) => e.stopPropagation()}>
+                <button className="close-modal" onClick={() => setShowFullImage(false)}>✕</button>
+                <img
+                  src={product.images[selectedImage]}
+                  alt={product.name}
+                  className="fullscreen-image"
+                />
+                {product.images && product.images.length > 1 && (
+                  <>
+                    <button 
+                      className="nav-btn prev-btn" 
+                      onClick={() => setSelectedImage((prev) => prev === 0 ? product.images.length - 1 : prev - 1)}
+                    >
+                      ‹
+                    </button>
+                    <button 
+                      className="nav-btn next-btn" 
+                      onClick={() => setSelectedImage((prev) => prev === product.images.length - 1 ? 0 : prev + 1)}
+                    >
+                      ›
+                    </button>
+                    <div className="image-counter">
+                      {selectedImage + 1} / {product.images.length}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Right Side - Product Info & Description */}
           <div className="product-info-section">

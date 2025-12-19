@@ -1,0 +1,444 @@
+/* Sales Analytics Styles */
+.sales-analytics {
+  padding: 2rem;
+  background: linear-gradient(135deg, #FAF3E0 0%, #FFF8E1 100%);
+  min-height: 100vh;
+}
+
+.analytics-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #E8DFC8;
+}
+
+.analytics-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #4E342E;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.analytics-header p {
+  color: #6B5D54;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+/* Total Revenue Card */
+.total-revenue-card {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 16px;
+  margin: 2rem 0;
+  box-shadow: 0 8px 30px rgba(217, 119, 6, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.total-revenue-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  animation: float 6s ease-in-out infinite;
+}
+
+.revenue-icon {
+  font-size: 4rem;
+  opacity: 0.9;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.revenue-info {
+  flex: 1;
+  z-index: 2;
+}
+
+.revenue-info h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  opacity: 0.9;
+}
+
+.revenue-amount {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  animation: scaleIn 0.8s ease-out;
+}
+
+.revenue-period {
+  font-size: 1rem;
+  opacity: 0.8;
+  margin: 0;
+  font-weight: 500;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.time-range-selector {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  background: #F5EFE0;
+  padding: 0.5rem;
+  border-radius: 12px;
+  display: inline-flex;
+}
+
+.time-range-selector button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #6B5D54;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.time-range-selector button.active,
+.time-range-selector button:hover {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+  gap: 2rem;
+  max-width: 100%;
+  width: 100%;
+}
+
+.chart-container {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #E8DFC8;
+  transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+  box-shadow: 0 8px 30px rgba(194, 157, 94, 0.15);
+  transform: translateY(-2px);
+}
+
+.chart-container.large {
+  grid-column: 1 / -1;
+  min-height: 650px;
+  width: 100%;
+}
+
+.chart-container.medium {
+  min-height: 400px;
+}
+
+.chart-container h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #4E342E;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #E8DFC8;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chart-header-with-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #E8DFC8;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.chart-header-with-total h3 {
+  margin: 0;
+  padding: 0;
+  border: none;
+  flex: 1;
+  min-width: 200px;
+}
+
+.category-total-revenue {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.1) 0%, rgba(180, 83, 9, 0.1) 100%);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(217, 119, 6, 0.2);
+  min-width: 200px;
+}
+
+.total-label {
+  font-size: 0.9rem;
+  color: #6B5D54;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.total-amount {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #d97706;
+  text-shadow: 0 1px 2px rgba(217, 119, 6, 0.2);
+}
+
+.chart-wrapper {
+  height: 500px;
+  position: relative;
+  width: 100%;
+}
+
+.chart-container.large .chart-wrapper {
+  height: 600px;
+}
+
+.chart-container.medium .chart-wrapper {
+  height: 450px;
+}
+
+.chart-wrapper canvas {
+  max-width: 100% !important;
+  height: 100% !important;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #E8DFC8;
+}
+
+.analytics-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.analytics-table th {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.analytics-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #F0E8D8;
+  color: #4E342E;
+  font-weight: 500;
+}
+
+.analytics-table tr:hover {
+  background: #FFF8E1;
+}
+
+.analytics-table tr:last-child td {
+  border-bottom: none;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+}
+
+.loading-spinner {
+  font-size: 1.2rem;
+  color: #6B5D54;
+  text-align: center;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Responsive Design */
+@media (max-width: 1400px) {
+  .analytics-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .chart-container.large {
+    grid-column: 1 / -1;
+    min-height: 550px;
+  }
+  
+  .chart-wrapper {
+    height: 450px;
+  }
+  
+  .chart-container.large .chart-wrapper {
+    height: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sales-analytics {
+    padding: 1rem;
+  }
+  
+  .analytics-header {
+    padding: 1.5rem;
+  }
+  
+  .analytics-header h1 {
+    font-size: 2rem;
+  }
+  
+  .total-revenue-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+  
+  .revenue-amount {
+    font-size: 2.5rem;
+  }
+  
+  .revenue-icon {
+    font-size: 3rem;
+  }
+  
+  .time-range-selector {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .time-range-selector button {
+    width: 100%;
+  }
+  
+  .chart-container {
+    padding: 1.5rem;
+  }
+  
+  .chart-wrapper {
+    height: 300px;
+  }
+  
+  .chart-container.large .chart-wrapper,
+  .chart-container.medium .chart-wrapper {
+    height: 300px;
+  }
+  
+  .analytics-table {
+    font-size: 0.9rem;
+  }
+  
+  .analytics-table th,
+  .analytics-table td {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .chart-header-with-total {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .chart-header-with-total h3 {
+    min-width: auto;
+  }
+  
+  .category-total-revenue {
+    align-items: flex-start;
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .total-amount {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .analytics-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .total-revenue-card {
+    padding: 1rem;
+  }
+  
+  .revenue-amount {
+    font-size: 2rem;
+  }
+  
+  .revenue-icon {
+    font-size: 2.5rem;
+  }
+  
+  .chart-container {
+    padding: 1rem;
+  }
+  
+  .chart-wrapper {
+    height: 250px;
+  }
+  
+  .analytics-table {
+    font-size: 0.8rem;
+  }
+  
+  .analytics-table th,
+  .analytics-table td {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .category-total-revenue {
+    padding: 0.75rem 1rem;
+  }
+  
+  .total-amount {
+    font-size: 1.3rem;
+  }
+  
+  .total-label {
+    font-size: 0.8rem;
+  }
+}

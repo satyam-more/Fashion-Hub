@@ -250,7 +250,7 @@ module.exports = (con) => {
   router.get("/admin/users", authenticateToken, authorizeAdmin, async (req, res) => {
     try {
       const [users] = await con.execute(
-        "SELECT id, username, email, role, created_at FROM users ORDER BY created_at DESC"
+        "SELECT id, username, email, phone, city, state, address, role, created_at FROM users ORDER BY created_at DESC"
       );
 
       res.json({

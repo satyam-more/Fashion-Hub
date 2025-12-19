@@ -683,10 +683,10 @@ router.get('/admin/appointments', authenticateToken, async (req, res) => {
     connection = await mysql.createConnection(dbConfig);
 
     const [appointments] = await connection.execute(
-      `SELECT ca.*, u.username as customer_name, u.email as customer_email
-       FROM custom_appointments ca
-       JOIN users u ON ca.user_id = u.id
-       ORDER BY ca.created_at DESC`
+      `SELECT a.*, u.username as customer_name, u.email as customer_email
+       FROM appointments a
+       JOIN users u ON a.user_id = u.id
+       ORDER BY a.created_at DESC`
     );
 
     // Parse JSON fields safely

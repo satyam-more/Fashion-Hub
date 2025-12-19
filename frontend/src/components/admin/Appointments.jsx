@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminLayout from './AdminLayout';
 import '../../styles/admin/Appointments.css';
+import '../../styles/admin/ExportButton.css';
+import { exportAppointmentsReport } from '../../utils/pdfExport';
 
 const Appointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -114,8 +116,25 @@ const Appointments = () => {
     <AdminLayout>
       <div className="appointments-container">
         <div className="appointments-header">
-          <h1>✂️ Custom Tailoring Appointments</h1>
-          <p>Manage and verify customer appointments</p>
+          <div>
+            <h1>✂️ Custom Tailoring Appointments</h1>
+            <p>Manage and verify customer appointments</p>
+          </div>
+          <button 
+            className="export-pdf-btn"
+            onClick={() => {
+              const stats = {
+                total: appointments.length,
+                pending: appointments.filter(a => a.status === 'pending').length,
+                confirmed: appointments.filter(a => a.status === 'confirmed').length,
+                completed: appointments.filter(a => a.status === 'completed').length
+              };
+              exportAppointmentsReport(filteredAppointments, stats);
+            }}
+          >
+            <span className="icon">📄</span>
+            Export PDF
+          </button>
         </div>
 
         {/* Filter Tabs */}

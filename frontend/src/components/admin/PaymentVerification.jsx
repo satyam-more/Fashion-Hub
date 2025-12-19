@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminLayout from './AdminLayout';
 import '../../styles/admin/PaymentVerification.css';
+import '../../styles/admin/ExportButton.css';
+import { exportPaymentsReport } from '../../utils/pdfExport';
 
 const PaymentVerification = () => {
   const [pendingPayments, setPendingPayments] = useState([]);
@@ -35,14 +37,14 @@ const PaymentVerification = () => {
   const fetchPendingPayments = async () => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/admin/payments/pending`,
+        `${API_BASE_URL}/admin/payments/all`,
         { headers: getAuthHeaders() }
       );
       if (response.data.success) {
         setPendingPayments(response.data.data);
       }
     } catch (error) {
-      console.error('Error fetching pending payments:', error);
+      console.error('Error fetching payments:', error);
     } finally {
       setLoading(false);
     }
@@ -153,8 +155,25 @@ const PaymentVerification = () => {
     <AdminLayout>
       <div className="payment-verification-container">
         <div className="page-header">
-          <h1>💳 Payment Verification</h1>
-          <p>Review and verify UPI payments</p>
+          <div>
+            <h1>💳 Payment Verification</h1>
+            <p>Review and verify UPI payments</p>
+          </div>
+          <button 
+            className="export-pdf-btn"
+            onClick={() => {
+              const exportStats = {
+                total: pendingPayments.length,
+                pending: stats?.pending?.count || 0,
+                verified: stats?.verifiedToday?.count || 0,
+                totalAmount: stats?.pending?.amount || 0
+              };
+              exportPaymentsReport(pendingPayments, exportStats);
+            }}
+          >
+            <span className="icon">📄</span>
+            Export PDF
+          </button>
         </div>
 
         {/* Stats Cards */}

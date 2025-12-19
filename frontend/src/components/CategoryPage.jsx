@@ -33,6 +33,8 @@ const CategoryPage = () => {
   });
 
   useEffect(() => {
+    // Scroll to top when component mounts or category changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     fetchCategoryData();
     fetchProducts();
   }, [category, subcategory]);
@@ -79,11 +81,18 @@ const CategoryPage = () => {
       let url = 'http://localhost:5000/api/products';
       const params = new URLSearchParams();
       
-      if (category) {
-        params.append('category', category);
+      // Only add category filter if it's not "all"
+      if (category && category.toLowerCase() !== 'all') {
+        // Send category as lowercase to match database
+        params.append('category', category.toLowerCase());
       }
       if (subcategory) {
-        params.append('subcategory', subcategory.replace(/-/g, ' '));
+        // Convert hyphenated subcategory to proper format (e.g., "formal-wear" -> "Formal Wear")
+        const formattedSubcategory = subcategory
+          .split('-')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+        params.append('subcategory', formattedSubcategory);
       }
       
       if (params.toString()) {

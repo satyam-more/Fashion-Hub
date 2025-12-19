@@ -1,5 +1,16 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+
+// Scroll to top component
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
 import Login from "./components/Login";
 import Register from "./components/Register";
 import ForgotPassword from "./components/ForgotPassword";
@@ -7,6 +18,7 @@ import UserDashboard from "./components/user/UserDashboard";
 import Profile from "./components/user/Profile";
 import Orders from "./components/user/Orders";
 import Cart from "./components/user/Cart";
+import Wishlist from "./components/user/Wishlist";
 import Checkout from "./components/user/Checkout";
 import OrderConfirmation from "./components/user/OrderConfirmation";
 import CustomTailoring from "./components/user/CustomTailoring";
@@ -23,6 +35,8 @@ import AdminOrders from "./components/admin/Orders";
 import Reviews from "./components/admin/Reviews";
 import Settings from "./components/admin/Settings";
 import Analytics from "./components/admin/AnalyticsEnhanced";
+import SalesAnalytics from "./components/admin/SalesAnalytics";
+import ConsultationAnalytics from "./components/admin/ConsultationAnalytics";
 import PaymentVerification from "./components/admin/PaymentVerification";
 import Appointments from "./components/admin/Appointments";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -30,6 +44,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
           {/* User Dashboard Route - Entry Point (Public) */}
           <Route path="/" element={<UserDashboard />} />
@@ -72,6 +87,13 @@ function App() {
           <Route path="/cart" element={
             <ProtectedRoute allowedRoles={['user', 'admin']}>
               <Cart />
+            </ProtectedRoute>
+          } />
+          
+          {/* User Wishlist Route */}
+          <Route path="/wishlist" element={
+            <ProtectedRoute allowedRoles={['user', 'admin']}>
+              <Wishlist />
             </ProtectedRoute>
           } />
           
@@ -169,6 +191,20 @@ function App() {
           <Route path="/admin/analytics" element={
             <ProtectedRoute allowedRoles={['admin']}>
               <Analytics />
+            </ProtectedRoute>
+          } />
+          
+          {/* Admin Sales Analytics Route */}
+          <Route path="/admin/sales-analytics" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <SalesAnalytics />
+            </ProtectedRoute>
+          } />
+          
+          {/* Admin Consultation Analytics Route */}
+          <Route path="/admin/consultation-analytics" element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <ConsultationAnalytics />
             </ProtectedRoute>
           } />
           

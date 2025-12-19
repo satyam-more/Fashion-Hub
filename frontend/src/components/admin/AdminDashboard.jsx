@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AdminLayout from './AdminLayout';
 import '../../styles/admin/AdminDashboard.css';
+import '../../styles/admin/ExportButton.css';
+import { exportDashboardReport } from '../../utils/pdfExport';
 
 const AdminDashboard = () => {
   const [dashboardStats, setDashboardStats] = useState({
@@ -65,7 +67,16 @@ const AdminDashboard = () => {
   const renderDashboardContent = () => {
     return (
       <div className="content-section">
-        <h2>Dashboard Overview</h2>
+        <div className="dashboard-header-row">
+          <h2>Dashboard Overview</h2>
+          <button 
+            className="export-pdf-btn"
+            onClick={() => exportDashboardReport(dashboardStats)}
+          >
+            <span className="icon">📄</span>
+            Export PDF
+          </button>
+        </div>
         {loading ? (
           <div className="loading">Loading dashboard data...</div>
         ) : (

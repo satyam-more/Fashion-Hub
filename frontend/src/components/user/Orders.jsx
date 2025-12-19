@@ -6,6 +6,7 @@ import '../../styles/user/Orders.css';
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedOrder, setExpandedOrder] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -78,6 +79,35 @@ const Orders = () => {
       month: 'short',
       day: 'numeric'
     });
+  };
+
+  const toggleTracking = (orderId) => {
+    setExpandedOrder(expandedOrder === orderId ? null : orderId);
+  };
+
+  const getTrackingSteps = (status) => {
+    const allSteps = [
+      { key: 'pending', label: 'Order Placed', icon: '📝', description: 'Your order has been received' },
+      { key: 'processing', label: 'Processing', icon: '⚙️', description: 'We are preparing your order' },
+      { key: 'shipped', label: 'Shipped', icon: '🚚', description: 'Your order is on the way' },
+      { key: 'delivered', label: 'Delivered', icon: '✅', description: 'Order delivered successfully' }
+    ];
+
+    if (status === 'cancelled') {
+      return [
+        { key: 'pending', label: 'Order Placed', icon: '📝', description: 'Your order was received', completed: true },
+        { key: 'cancelled', label: 'Cancelled', icon: '❌', description: 'Order has been cancelled', completed: true, isCancelled: true }
+      ];
+    }
+
+    const statusOrder = ['pending', 'processing', 'shipped', 'delivered'];
+    const currentIndex = statusOrder.indexOf(status);
+
+    return allSteps.map((step, index) => ({
+      ...step,
+      completed: index <= currentIndex,
+      active: index === currentIndex
+    }));
   };
 
   if (loading) {
@@ -179,11 +209,57 @@ const Orders = () => {
                           Cancel Order
                         </button>
                       )}
-                      <button className="track-btn">
-                        Track Order
+                      <button 
+                        className="track-btn"
+                        onClick={() => toggleTracking(order.order_id)}
+                      >
+                        <span>{expandedOrder === order.order_id ? 'Hide Tracking' : 'Track Order'}</span>
                       </button>
                     </div>
                   </div>
+
+                  {/* Order Tracking Section */}
+                  {expandedOrder === order.order_id && (
+                    <div className="tracking-section">
+                      <div className="tracking-header">
+                        <h4>📍 Order Tracking</h4>
+                        <p>Order #{order.order_number}</p>
+                      </div>
+                      
+                      <div className="tracking-timeline">
+                        {getTrackingSteps(order.status).map((step, index) => (
+                          <div 
+                            key={step.key} 
+                            className={`tracking-step ${step.completed ? 'completed' : ''} ${step.active ? 'active' : ''} ${step.isCancelled ? 'cancelled' : ''}`}
+                          >
+                            <div className="step-icon">{step.icon}</div>
+                            <div className="step-content">
+                              <h5>{step.label}</h5>
+                              <p>{step.description}</p>
+                            </div>
+                            {index < getTrackingSteps(order.status).length - 1 && (
+                              <div className="step-connector"></div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="tracking-info">
+                        <div className="info-item">
+                          <span className="info-label">📅 Order Date:</span>
+                          <span className="info-value">{formatDate(order.created_at)}</span>
+                        </div>
+                        <div className="info-item">
+                          <span className="info-label">💳 Payment Method:</span>
+                          <span className="info-value">{order.payment_method || 'UPI'}</span>
+                        </div>
+                        <div className="info-item">
+                          <span className="info-label">📦 Total Items:</span>
+                          <span className="info-value">{order.items.length}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminLayout from './AdminLayout';
 import '../../styles/admin/Analytics.css';
+import '../../styles/admin/ExportButton.css';
+import { exportAnalyticsReport } from '../../utils/pdfExport';
 
 const Analytics = () => {
   const [analyticsData, setAnalyticsData] = useState({
@@ -352,9 +354,12 @@ const Analytics = () => {
               <option value="1year">Last Year</option>
             </select>
             
-            <button className="export-btn">
-              <span className="icon">📊</span>
-              Export Report
+            <button 
+              className="export-btn"
+              onClick={() => exportAnalyticsReport(analyticsData, dateRange)}
+            >
+              <span className="icon">📄</span>
+              Export PDF
             </button>
           </div>
         </div>

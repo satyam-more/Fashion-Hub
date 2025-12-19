@@ -139,30 +139,34 @@ const Cart = () => {
                       </div>
                     </div>
                     <div className="item-details">
-                      <h3>{item.product_name}</h3>
-                      <p className="item-category">{item.category_name} - {item.subcategory_name}</p>
-                      <p className="item-color">Color: {item.colour}</p>
-                      {item.size && <p className="item-size">Size: {item.size}</p>}
-                      <p className="item-price">₹{item.price}</p>
+                      <h3 className="item-name">{item.product_name}</h3>
+                      <p className="item-category">{item.category_name} • {item.subcategory_name}</p>
+                      <p className="item-meta">Color: <strong>{item.colour}</strong></p>
+                      {item.size && <p className="item-meta">Size: <strong>{item.size}</strong></p>}
+                      <div className="item-quantity">
+                        <button 
+                          className="qty-btn"
+                          onClick={() => updateQuantity(item.cart_id, item.quantity - 1)}
+                          disabled={item.quantity <= 1}
+                        >
+                          -
+                        </button>
+                        <span className="qty-display">{item.quantity}</span>
+                        <button 
+                          className="qty-btn"
+                          onClick={() => updateQuantity(item.cart_id, item.quantity + 1)}
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
-                    <div className="item-quantity">
-                      <button 
-                        onClick={() => updateQuantity(item.cart_id, item.quantity - 1)}
-                        disabled={item.quantity <= 1}
-                      >
-                        -
-                      </button>
-                      <span>{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.cart_id, item.quantity + 1)}>
-                        +
-                      </button>
-                    </div>
-                    <div className="item-total">
+                    <div className="item-price">
                       ₹{item.total}
                     </div>
                     <button 
                       className="remove-btn"
                       onClick={() => removeItem(item.cart_id)}
+                      aria-label={`Remove ${item.product_name} from cart`}
                     >
                       ✕
                     </button>
@@ -174,22 +178,22 @@ const Cart = () => {
                 <div className="summary-card">
                   <h3>Order Summary</h3>
                   <div className="summary-row">
-                    <span>Subtotal ({cartItems.length} items)</span>
-                    <span>₹{total}</span>
+                    <span className="label">Subtotal ({cartItems.length} items)</span>
+                    <span className="value">₹{total}</span>
                   </div>
                   <div className="summary-row">
-                    <span>Shipping</span>
-                    <span>FREE</span>
+                    <span className="label">Shipping</span>
+                    <span className="value">FREE</span>
                   </div>
                   <div className="summary-row total">
-                    <span>Total</span>
-                    <span>₹{total}</span>
+                    <span className="label">Total</span>
+                    <span className="value">₹{total}</span>
                   </div>
                   <button className="checkout-btn" onClick={proceedToCheckout}>
                     Proceed to Checkout
                   </button>
                   <p className="shipping-info">
-                    <span>🎉 Free shipping on all orders!</span>
+                    🎉 Free shipping on all orders!
                   </p>
                 </div>
               </div>

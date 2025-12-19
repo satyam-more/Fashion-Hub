@@ -13,7 +13,7 @@ const Footer = () => {
           <div className="footer-brand">
             <h3 className="footer-logo">Fashion Hub</h3>
             <p className="footer-tagline">
-              Where tradition meets modern elegance.
+              Where trends meet personality
             </p>
           </div>
 

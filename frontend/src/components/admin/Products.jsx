@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminLayout from './AdminLayout';
 import '../../styles/admin/Products.css';
+import '../../styles/admin/ExportButton.css';
+import { exportProductsReport } from '../../utils/pdfExport';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -18,6 +20,12 @@ const Products = () => {
     search: '',
     type: ''
   });
+  
+  // State for filter subcategories
+  const [filterSubcategories, setFilterSubcategories] = useState([]);
+  
+  // Ref to store scroll position
+  const scrollPositionRef = React.useRef(0);
 
   // Form data state
   const [formData, setFormData] = useState({
@@ -32,6 +40,7 @@ const Products = () => {
     colour: '',
     sizes: [],
     tags: [],
+    tagsInput: '', // Raw input for tags field
     images: []
   });
 
@@ -42,8 +51,25 @@ const Products = () => {
 
   const API_BASE_URL = 'http://localhost:5000/api';
   const sizeOptions = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
-  const typeOptions = ['upperwear', 'bottomwear', 'accessories'];
+  const baseTypeOptions = ['upperwear', 'bottomwear', 'accessories', 'saree'];
   const fabricOptions = ['Cotton', 'Silk', 'Polyester', 'Cotton Blend', 'Linen', 'Wool', 'Georgette', 'Chiffon', 'Denim'];
+
+  // Get available type options based on category and subcategory
+  const getAvailableTypeOptions = () => {
+    // Saree is only available for Women's Traditional category
+    if (formData.category === 'womens' && formData.subcategory) {
+      // The subcategory value is the name itself (not ID)
+      const subcategoryName = formData.subcategory.toLowerCase();
+      
+      // Check if the subcategory is 'Traditional'
+      if (subcategoryName === 'traditional') {
+        return baseTypeOptions; // Include saree
+      }
+    }
+    
+    // Filter out saree for other combinations
+    return baseTypeOptions.filter(type => type !== 'saree');
+  };
 
   // Get auth token
   const getAuthToken = () => {
@@ -69,7 +95,22 @@ const Products = () => {
     }
   }, [formData.category]);
 
-  const fetchData = async () => {
+  // Prevent scroll restoration on component updates
+  useEffect(() => {
+    // Disable automatic scroll restoration
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    
+    return () => {
+      // Re-enable on unmount
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'auto';
+      }
+    };
+  }, []);
+
+  const fetchData = async (preserveScroll = false) => {
     try {
       setLoading(true);
       setError(null);
@@ -93,6 +134,17 @@ const Products = () => {
       setError('Failed to fetch data. Please check if the server is running.');
     } finally {
       setLoading(false);
+      
+      // Restore scroll position if needed
+      if (preserveScroll && scrollPositionRef.current > 0) {
+        // Use requestAnimationFrame for smoother scroll restoration
+        requestAnimationFrame(() => {
+          window.scrollTo({
+            top: scrollPositionRef.current,
+            behavior: 'instant'
+          });
+        });
+      }
     }
   };
 
@@ -123,23 +175,46 @@ const Products = () => {
         }));
       }
     } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
+      setFormData(prev => {
+        const newData = {
+          ...prev,
+          [name]: value
+        };
+        
+        // If category or subcategory changes and current type is 'saree',
+        // check if saree is still allowed, if not reset to 'upperwear'
+        if ((name === 'category' || name === 'subcategory') && prev.type === 'saree') {
+          const currentCategory = name === 'category' ? value : prev.category;
+          const currentSubcategory = name === 'subcategory' ? value : prev.subcategory;
+          
+          const isSareeAllowed = currentCategory === 'womens' && 
+                                currentSubcategory && 
+                                currentSubcategory.toLowerCase() === 'traditional';
+          
+          if (!isSareeAllowed) {
+            newData.type = 'upperwear';
+          }
+        }
+        
+        return newData;
+      });
     }
   };
 
   const handleTagsChange = (e) => {
+    const inputValue = e.target.value;
+    
+    // Store the raw input value temporarily for display
     // Split by comma, then trim each tag and filter out empty ones
-    const tags = e.target.value
+    const tags = inputValue
       .split(',')
       .map(tag => tag.trim())
       .filter(tag => tag.length > 0);
     
     setFormData(prev => ({
       ...prev,
-      tags
+      tags,
+      tagsInput: inputValue // Store raw input for display
     }));
   };
 
@@ -230,12 +305,40 @@ const Products = () => {
     }));
   };
 
-  const handleFilterChange = (e) => {
+  const handleFilterChange = async (e) => {
     const { name, value } = e.target;
-    setFilters(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // If category changes, clear subcategory and fetch new subcategories
+    if (name === 'category') {
+      setFilters(prev => ({
+        ...prev,
+        category: value,
+        subcategory: '' // Clear subcategory when category changes
+      }));
+      
+      // Fetch subcategories for the selected category
+      if (value) {
+        const category = categories.find(cat => cat.name === value);
+        if (category) {
+          try {
+            const response = await axios.get(`${API_BASE_URL}/products/subcategories/${category.id}`);
+            if (response.data.success) {
+              setFilterSubcategories(response.data.data || []);
+            }
+          } catch (err) {
+            console.error('Error fetching filter subcategories:', err);
+            setFilterSubcategories([]);
+          }
+        }
+      } else {
+        setFilterSubcategories([]);
+      }
+    } else {
+      setFilters(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const resetForm = () => {
@@ -264,6 +367,10 @@ const Products = () => {
     setError(null);
     setSuccess(null);
 
+    // Save scroll position BEFORE any async operations
+    const savedScrollPosition = window.scrollY;
+    scrollPositionRef.current = savedScrollPosition;
+
     try {
       const token = getAuthToken();
       if (!token) {
@@ -278,8 +385,14 @@ const Products = () => {
         finalImages = [...finalImages, ...newImageUrls];
       }
 
+      // Find category and subcategory IDs
+      const category = categories.find(cat => cat.name === formData.category);
+      const subcategory = subcategories.find(sub => sub.name === formData.subcategory);
+
       const productData = {
         ...formData,
+        category_id: category?.id,
+        subcategory_id: subcategory?.id,
         price: parseFloat(formData.price),
         discount: parseFloat(formData.discount) || 0,
         quantity: parseInt(formData.quantity),
@@ -307,7 +420,9 @@ const Products = () => {
         setSuccess(editingProduct ? 'Product updated successfully!' : 'Product created successfully!');
         setShowModal(false);
         resetForm();
-        fetchData(); // Refresh the products list
+        
+        // Fetch data and restore scroll immediately
+        await fetchData(true);
       }
 
     } catch (err) {
@@ -349,6 +464,10 @@ const Products = () => {
       return;
     }
 
+    // Save scroll position BEFORE any operations
+    const savedScrollPosition = window.scrollY;
+    scrollPositionRef.current = savedScrollPosition;
+
     try {
       const token = getAuthToken();
       if (!token) {
@@ -363,7 +482,7 @@ const Products = () => {
 
       if (response.data.success) {
         setSuccess('Product deleted successfully!');
-        fetchData(); // Refresh the products list
+        await fetchData(true); // Refresh the products list and preserve scroll position
       }
 
     } catch (err) {
@@ -394,10 +513,7 @@ const Products = () => {
   };
 
   const getFilteredSubcategories = () => {
-    if (!filters.category) return [];
-    const category = categories.find(cat => cat.name === filters.category);
-    if (!category) return [];
-    return subcategories.filter(sub => sub.category_id === category.id);
+    return filterSubcategories;
   };
 
   if (loading) {
@@ -437,16 +553,33 @@ const Products = () => {
       {/* Header */}
       <div className="products-header">
         <h2>Manage Products</h2>
-        <button 
-          className="add-product-btn"
-          onClick={() => {
-            resetForm();
-            setShowModal(true);
-          }}
-        >
-          <span className="icon">➕</span>
-          Add New Product
-        </button>
+        <div className="header-actions">
+          <button 
+            className="export-pdf-btn"
+            onClick={() => {
+              const stats = {
+                totalProducts: products.length,
+                activeProducts: products.filter(p => p.status === 'active').length,
+                lowStock: products.filter(p => p.quantity < 10).length,
+                inventoryValue: products.reduce((sum, p) => sum + (p.price * p.quantity), 0)
+              };
+              exportProductsReport(filteredProducts, stats);
+            }}
+          >
+            <span className="icon">📄</span>
+            Export PDF
+          </button>
+          <button 
+            className="add-product-btn"
+            onClick={() => {
+              resetForm();
+              setShowModal(true);
+            }}
+          >
+            <span className="icon">➕</span>
+            Add New Product
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -474,10 +607,25 @@ const Products = () => {
           </div>
           
           <div className="filter-group">
+            <label>Subcategory</label>
+            <select 
+              name="subcategory" 
+              value={filters.subcategory} 
+              onChange={handleFilterChange}
+              disabled={!filters.category}
+            >
+              <option value="">All Subcategories</option>
+              {getFilteredSubcategories().map(sub => (
+                <option key={sub.id} value={sub.name}>{sub.name}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="filter-group">
             <label>Type</label>
             <select name="type" value={filters.type} onChange={handleFilterChange}>
               <option value="">All Types</option>
-              {typeOptions.map(type => (
+              {baseTypeOptions.map(type => (
                 <option key={type} value={type}>{type}</option>
               ))}
             </select>
@@ -728,10 +876,16 @@ const Products = () => {
                     onChange={handleInputChange}
                     required
                   >
-                    {typeOptions.map(type => (
+                    {getAvailableTypeOptions().map(type => (
                       <option key={type} value={type}>{type}</option>
                     ))}
                   </select>
+                  {formData.category === 'womens' && formData.subcategory && 
+                   formData.subcategory.toLowerCase() !== 'traditional' && (
+                    <small style={{ color: '#666', fontSize: '0.85rem', marginTop: '0.25rem', display: 'block' }}>
+                      💡 Saree type is only available for Women's Traditional category
+                    </small>
+                  )}
                 </div>
               </div>
 
@@ -809,10 +963,15 @@ const Products = () => {
                   <label>Tags (comma separated)</label>
                   <input
                     type="text"
-                    value={formData.tags.join(', ')}
+                    value={formData.tagsInput !== undefined ? formData.tagsInput : (Array.isArray(formData.tags) ? formData.tags.join(', ') : '')}
                     onChange={handleTagsChange}
                     placeholder="e.g., designer, formal, premium"
                   />
+                  {formData.tags && formData.tags.length > 0 && (
+                    <small style={{ color: '#666', fontSize: '0.85rem', marginTop: '0.25rem', display: 'block' }}>
+                      {formData.tags.length} tag{formData.tags.length !== 1 ? 's' : ''}: {formData.tags.join(', ')}
+                    </small>
+                  )}
                 </div>
               </div>
 

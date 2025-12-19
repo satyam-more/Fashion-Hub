@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminLayout from './AdminLayout';
 import '../../styles/admin/Users.css';
+import '../../styles/admin/ExportButton.css';
+import { exportUsersReport } from '../../utils/pdfExport';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -18,6 +20,10 @@ const Users = () => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
+    phone: '',
+    city: '',
+    state: '',
+    address: '',
     role: 'user',
     status: 'active'
   });
@@ -43,6 +49,7 @@ const Users = () => {
         headers: getAuthHeaders()
       });
       
+      // Admin API returns data in response.data.data
       if (response.data.success) {
         setUsers(response.data.data || []);
       }
@@ -74,6 +81,10 @@ const Users = () => {
     setFormData({
       username: '',
       email: '',
+      phone: '',
+      city: '',
+      state: '',
+      address: '',
       role: 'user',
       status: 'active'
     });
@@ -118,6 +129,10 @@ const Users = () => {
     setFormData({
       username: user.username,
       email: user.email,
+      phone: user.phone || '',
+      city: user.city || '',
+      state: user.state || '',
+      address: user.address || '',
       role: user.role,
       status: user.status || 'active'
     });
@@ -203,16 +218,33 @@ const Users = () => {
       {/* Header */}
       <div className="users-header">
         <h2>Manage Users</h2>
-        <button 
-          className="add-user-btn"
-          onClick={() => {
-            resetForm();
-            setShowModal(true);
-          }}
-        >
-          <span className="icon">👤</span>
-          Add New User
-        </button>
+        <div className="header-actions">
+          <button 
+            className="export-pdf-btn"
+            onClick={() => {
+              const stats = {
+                totalUsers: users.length,
+                admins: users.filter(u => u.role === 'admin').length,
+                customers: users.filter(u => u.role === 'user').length,
+                activeUsers: users.filter(u => (u.status || 'active') === 'active').length
+              };
+              exportUsersReport(filteredUsers, stats);
+            }}
+          >
+            <span className="icon">📄</span>
+            Export PDF
+          </button>
+          <button 
+            className="add-user-btn"
+            onClick={() => {
+              resetForm();
+              setShowModal(true);
+            }}
+          >
+            <span className="icon">👤</span>
+            Add New User
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -278,14 +310,13 @@ const Users = () => {
               <th>Role</th>
               <th>Status</th>
               <th>Join Date</th>
-              <th>Last Login</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>
                   No users found. {users.length === 0 ? 'No users registered yet.' : 'Try adjusting your filters.'}
                 </td>
               </tr>
@@ -319,12 +350,6 @@ const Users = () => {
                   </td>
                   <td>
                     {new Date(user.created_at).toLocaleDateString('en-IN')}
-                  </td>
-                  <td>
-                    {user.last_login ? 
-                      new Date(user.last_login).toLocaleDateString('en-IN') : 
-                      'Never'
-                    }
                   </td>
                   <td>
                     <div className="action-buttons">
@@ -392,6 +417,54 @@ const Users = () => {
                     onChange={handleInputChange}
                     required
                     placeholder="Enter email address"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Phone</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    placeholder="Enter phone number"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>City</label>
+                  <input
+                    type="text"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
+                    placeholder="Enter city"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>State</label>
+                  <input
+                    type="text"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleInputChange}
+                    placeholder="Enter state"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Address</label>
+                  <input
+                    type="text"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    placeholder="Enter address"
                   />
                 </div>
               </div>

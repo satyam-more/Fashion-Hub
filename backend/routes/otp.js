@@ -18,8 +18,28 @@ module.exports = (con) => {
     return emailRegex.test(email);
   };
 
+  // Send OTP for login (alias)
+  router.post('/send-login-otp', async (req, res) => {
+    return sendOTPHandler(req, res);
+  });
+
+  // Verify OTP for login (alias)
+  router.post('/verify-login-otp', async (req, res) => {
+    return verifyOTPHandler(req, res);
+  });
+
   // Send OTP to email
   router.post('/send-otp', async (req, res) => {
+    return sendOTPHandler(req, res);
+  });
+
+  // Verify OTP
+  router.post('/verify-otp', async (req, res) => {
+    return verifyOTPHandler(req, res);
+  });
+
+  // Main OTP send handler
+  const sendOTPHandler = async (req, res) => {
     try {
       const { email } = req.body;
 
@@ -113,10 +133,10 @@ module.exports = (con) => {
         error: 'Failed to send OTP. Please try again.' 
       });
     }
-  });
+  };
 
-  // Verify OTP and login
-  router.post('/verify-otp', async (req, res) => {
+  // Main OTP verify handler
+  const verifyOTPHandler = async (req, res) => {
     try {
       const { email, otp } = req.body;
 
@@ -237,7 +257,7 @@ module.exports = (con) => {
         error: 'Failed to verify OTP. Please try again.' 
       });
     }
-  });
+  };
 
   // Resend OTP
   router.post('/resend-otp', async (req, res) => {

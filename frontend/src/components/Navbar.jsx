@@ -11,7 +11,9 @@ const Navbar = () => {
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState({});
   const [isPremium, setIsPremium] = useState(false);
+  const [isHomePage, setIsHomePage] = useState(false);
   const navigate = useNavigate();
+  const location = window.location;
 
   useEffect(() => {
     // Check authentication status
@@ -22,7 +24,9 @@ const Navbar = () => {
     fetchCategories();
     // Check membership status
     checkMembership();
-  }, []);
+    // Check if on home page
+    setIsHomePage(location.pathname === '/' || location.pathname === '/dashboard');
+  }, [location.pathname]);
 
   const checkAuthStatus = () => {
     const token = localStorage.getItem('authToken');
@@ -144,7 +148,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar">
+    <nav className={`navbar ${isHomePage ? 'navbar-home' : ''}`}>
       {/* Top Row */}
       <div className="navbar-top-row">
         <div className="navbar-container">
@@ -157,19 +161,21 @@ const Navbar = () => {
 
           {/* Right: Search, Cart, Wishlist, Profile */}
           <div className="navbar-right-actions">
-            {/* Search Bar */}
-            <form onSubmit={handleSearch} className="navbar-search-form">
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="navbar-search-input"
-              />
-              <button type="submit" className="navbar-search-btn">
-                🔍
-              </button>
-            </form>
+            {/* Search Bar - Hidden on Home Page */}
+            {!isHomePage && (
+              <form onSubmit={handleSearch} className="navbar-search-form">
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="navbar-search-input"
+                />
+                <button type="submit" className="navbar-search-btn">
+                  🔍
+                </button>
+              </form>
+            )}
 
             {/* Cart */}
             <div className="navbar-icon-container">

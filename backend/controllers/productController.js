@@ -286,6 +286,14 @@ class ProductController {
         updateFields.push('type = ?');
         updateValues.push(updateData.type);
       }
+      if (updateData.category_id) {
+        updateFields.push('category_id = ?');
+        updateValues.push(parseInt(updateData.category_id));
+      }
+      if (updateData.subcategory_id) {
+        updateFields.push('subcategory_id = ?');
+        updateValues.push(parseInt(updateData.subcategory_id));
+      }
       if (updateData.sizes) {
         const sizesString = Array.isArray(updateData.sizes) ? 
           updateData.sizes.join(',') : updateData.sizes;

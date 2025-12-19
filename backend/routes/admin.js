@@ -114,9 +114,9 @@ router.get('/users', authenticateToken, authorizeAdmin, async (req, res) => {
     connection = await mysql.createConnection(dbConfig);
 
     const [users] = await connection.execute(`
-      SELECT id, username, email, role, created_at, updated_at
+      SELECT id, username, email, phone, city, state, address, role, created_at, updated_at
       FROM users
-      ORDER BY created_at DESC
+      ORDER BY id ASC
     `);
 
     res.json({
@@ -195,7 +195,7 @@ router.put('/users/:id', authenticateToken, authorizeAdmin, async (req, res) => 
   let connection;
   try {
     const { id } = req.params;
-    const { username, email, role, status } = req.body;
+    const { username, email, phone, city, state, address, role, status } = req.body;
 
     connection = await mysql.createConnection(dbConfig);
 
@@ -212,10 +212,10 @@ router.put('/users/:id', authenticateToken, authorizeAdmin, async (req, res) => 
       });
     }
 
-    // Update user
+    // Update user with contact details
     await connection.execute(
-      'UPDATE users SET username = ?, email = ?, role = ? WHERE id = ?',
-      [username, email, role, id]
+      'UPDATE users SET username = ?, email = ?, phone = ?, city = ?, state = ?, address = ?, role = ? WHERE id = ?',
+      [username, email, phone, city, state, address, role, id]
     );
 
     res.json({
@@ -902,6 +902,50 @@ router.post('/settings/:category', authenticateToken, authorizeAdmin, async (req
 // PAYMENT VERIFICATION ENDPOINTS
 // ============================================
 
+// Get all payments (for payment verification page)
+router.get('/payments/all', authenticateToken, authorizeAdmin, async (req, res) => {
+  let connection;
+  try {
+    connection = await mysql.createConnection(dbConfig);
+
+    const [allPayments] = await connection.execute(`
+      SELECT 
+        o.order_id,
+        o.order_number,
+        o.user_id,
+        o.total_amount,
+        o.payment_method,
+        o.payment_status,
+        o.transaction_id,
+        o.status as order_status,
+        o.created_at,
+        o.updated_at,
+        u.username as customer_name,
+        u.email as customer_email,
+        COUNT(oi.order_item_id) as items_count
+      FROM orders o
+      LEFT JOIN users u ON o.user_id = u.id
+      LEFT JOIN order_items oi ON o.order_id = oi.order_id
+      GROUP BY o.order_id
+      ORDER BY o.created_at DESC
+    `);
+
+    res.json({
+      success: true,
+      data: allPayments
+    });
+
+  } catch (error) {
+    console.error('Get all payments error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to fetch payments' 
+    });
+  } finally {
+    if (connection) await connection.end();
+  }
+});
+
 // Get pending payments (UPI orders waiting for verification)
 router.get('/payments/pending', authenticateToken, authorizeAdmin, async (req, res) => {
   let connection;
@@ -911,6 +955,7 @@ router.get('/payments/pending', authenticateToken, authorizeAdmin, async (req, r
     const [pendingPayments] = await connection.execute(`
       SELECT 
         o.order_id,
+        o.order_number,
         o.user_id,
         o.total_amount,
         o.payment_method,
@@ -925,7 +970,7 @@ router.get('/payments/pending', authenticateToken, authorizeAdmin, async (req, r
       LEFT JOIN users u ON o.user_id = u.id
       LEFT JOIN order_items oi ON o.order_id = oi.order_id
       WHERE o.payment_status = 'payment_pending'
-      AND o.payment_method = 'upi_direct'
+      AND (o.payment_method = 'upi_direct' OR o.payment_method = 'upi')
       GROUP BY o.order_id
       ORDER BY o.created_at DESC
     `);
@@ -1203,7 +1248,7 @@ router.get('/payments/stats', authenticateToken, authorizeAdmin, async (req, res
       SELECT COUNT(*) as count, COALESCE(SUM(total_amount), 0) as amount
       FROM orders 
       WHERE payment_status = 'payment_pending'
-      AND payment_method = 'upi_direct'
+      AND (payment_method = 'upi_direct' OR payment_method = 'upi')
     `);
 
     // Get today's verified payments
@@ -1211,7 +1256,7 @@ router.get('/payments/stats', authenticateToken, authorizeAdmin, async (req, res
       SELECT COUNT(*) as count, COALESCE(SUM(total_amount), 0) as amount
       FROM orders 
       WHERE payment_status = 'paid'
-      AND payment_method = 'upi_direct'
+      AND (payment_method = 'upi_direct' OR payment_method = 'upi')
       AND DATE(updated_at) = CURDATE()
     `);
 
@@ -1220,7 +1265,7 @@ router.get('/payments/stats', authenticateToken, authorizeAdmin, async (req, res
       SELECT COUNT(*) as count
       FROM orders 
       WHERE payment_status = 'failed'
-      AND payment_method = 'upi_direct'
+      AND (payment_method = 'upi_direct' OR payment_method = 'upi')
       AND DATE(updated_at) = CURDATE()
     `);
 
@@ -1269,3 +1314,295 @@ function getTimeAgo(date) {
 }
 
 module.exports = router;
+
+// Sales Analytics Endpoint
+router.get('/sales-analytics', authenticateToken, authorizeAdmin, async (req, res) => {
+  let connection;
+  try {
+    connection = await mysql.createConnection(dbConfig);
+    const { range = 'monthly' } = req.query;
+
+    let dateFormat, dateCondition;
+    switch (range) {
+      case 'weekly':
+        dateFormat = '%Y-%u';
+        dateCondition = 'WHERE created_at >= DATE_SUB(NOW(), INTERVAL 12 WEEK)';
+        break;
+      case 'yearly':
+        dateFormat = '%Y';
+        dateCondition = 'WHERE created_at >= DATE_SUB(NOW(), INTERVAL 5 YEAR)';
+        break;
+      default: // monthly
+        dateFormat = '%Y-%m';
+        dateCondition = 'WHERE created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)';
+    }
+
+    // Monthly/Weekly/Yearly Sales
+    const [salesData] = await connection.execute(`
+      SELECT 
+        DATE_FORMAT(created_at, '${dateFormat}') as period,
+        COUNT(*) as orders,
+        COALESCE(SUM(total_amount), 0) as revenue
+      FROM orders 
+      ${dateCondition} AND status != 'cancelled'
+      GROUP BY DATE_FORMAT(created_at, '${dateFormat}')
+      ORDER BY period
+    `);
+
+    // Category Sales
+    const [categorySales] = await connection.execute(`
+      SELECT 
+        p.category,
+        COUNT(oi.id) as orders,
+        COALESCE(SUM(oi.price * oi.quantity), 0) as revenue
+      FROM order_items oi
+      JOIN products p ON oi.product_id = p.id
+      JOIN orders o ON oi.order_id = o.id
+      WHERE o.created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH) 
+        AND o.status != 'cancelled'
+      GROUP BY p.category
+      ORDER BY revenue DESC
+    `);
+
+    // Top Products
+    const [topProducts] = await connection.execute(`
+      SELECT 
+        p.name,
+        COUNT(oi.id) as sales,
+        COALESCE(SUM(oi.price * oi.quantity), 0) as revenue
+      FROM order_items oi
+      JOIN products p ON oi.product_id = p.id
+      JOIN orders o ON oi.order_id = o.id
+      WHERE o.created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH) 
+        AND o.status != 'cancelled'
+      GROUP BY p.id, p.name
+      ORDER BY sales DESC
+      LIMIT 5
+    `);
+
+    // Payment Methods
+    const [paymentMethods] = await connection.execute(`
+      SELECT 
+        payment_method as method,
+        COUNT(*) as count,
+        ROUND((COUNT(*) * 100.0 / (SELECT COUNT(*) FROM orders WHERE created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH) AND status != 'cancelled')), 0) as percentage
+      FROM orders 
+      WHERE created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH) 
+        AND status != 'cancelled'
+      GROUP BY payment_method
+      ORDER BY count DESC
+    `);
+
+    // Format the data for frontend
+    const formattedSalesData = salesData.map(item => ({
+      month: item.period,
+      orders: parseInt(item.orders),
+      revenue: parseFloat(item.revenue)
+    }));
+
+    const formattedCategorySales = categorySales.map(item => ({
+      category: item.category,
+      orders: parseInt(item.orders),
+      revenue: parseFloat(item.revenue)
+    }));
+
+    const formattedTopProducts = topProducts.map(item => ({
+      name: item.name,
+      sales: parseInt(item.sales),
+      revenue: parseFloat(item.revenue)
+    }));
+
+    const formattedPaymentMethods = paymentMethods.map(item => ({
+      method: item.method,
+      count: parseInt(item.count),
+      percentage: parseInt(item.percentage)
+    }));
+
+    // Calculate total revenue
+    const totalRevenue = formattedSalesData.reduce((sum, item) => sum + item.revenue, 0);
+
+    res.json({
+      success: true,
+      data: {
+        monthlySales: formattedSalesData,
+        categorySales: formattedCategorySales,
+        topProducts: formattedTopProducts,
+        paymentMethods: formattedPaymentMethods,
+        totalRevenue: totalRevenue
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching sales analytics:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching sales analytics',
+      error: error.message
+    });
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
+  }
+});
+
+// Consultation Analytics Endpoint
+router.get('/consultation-analytics', authenticateToken, authorizeAdmin, async (req, res) => {
+  let connection;
+  try {
+    connection = await mysql.createConnection(dbConfig);
+    const { range = 'monthly' } = req.query;
+
+    let dateFormat, dateCondition;
+    switch (range) {
+      case 'weekly':
+        dateFormat = '%Y-%u';
+        dateCondition = 'WHERE appointment_date >= DATE_SUB(NOW(), INTERVAL 12 WEEK)';
+        break;
+      case 'yearly':
+        dateFormat = '%Y';
+        dateCondition = 'WHERE appointment_date >= DATE_SUB(NOW(), INTERVAL 5 YEAR)';
+        break;
+      default: // monthly
+        dateFormat = '%Y-%m';
+        dateCondition = 'WHERE appointment_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)';
+    }
+
+    // Monthly Bookings
+    const [bookingsData] = await connection.execute(`
+      SELECT 
+        DATE_FORMAT(appointment_date, '%Y-%m') as period,
+        MONTHNAME(appointment_date) as month_name,
+        COUNT(*) as bookings,
+        SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed,
+        SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) as cancelled
+      FROM appointments 
+      WHERE appointment_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+      GROUP BY DATE_FORMAT(appointment_date, '%Y-%m'), MONTHNAME(appointment_date)
+      ORDER BY period
+    `);
+
+    // Get all appointments to process service types from JSON
+    const [allAppointments] = await connection.execute(`
+      SELECT service_types 
+      FROM appointments 
+      WHERE appointment_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+        AND service_types IS NOT NULL
+    `);
+
+    // Process service types from JSON field
+    const serviceCount = {};
+    allAppointments.forEach(apt => {
+      try {
+        const services = JSON.parse(apt.service_types);
+        if (Array.isArray(services)) {
+          services.forEach(service => {
+            serviceCount[service] = (serviceCount[service] || 0) + 1;
+          });
+        } else {
+          serviceCount[services] = (serviceCount[services] || 0) + 1;
+        }
+      } catch (e) {
+        // If it's not JSON, treat as plain text
+        const service = apt.service_types;
+        serviceCount[service] = (serviceCount[service] || 0) + 1;
+      }
+    });
+
+    // Convert to array format
+    const serviceTypes = Object.entries(serviceCount).map(([service, bookings]) => ({
+      service,
+      bookings,
+      revenue: bookings * 1500 // Estimated revenue per booking
+    })).sort((a, b) => b.bookings - a.bookings);
+
+    // Time Slot Popularity
+    const [timeSlots] = await connection.execute(`
+      SELECT 
+        COALESCE(appointment_time, time_slot) as slot,
+        COUNT(*) as bookings
+      FROM appointments 
+      WHERE appointment_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+        AND (appointment_time IS NOT NULL OR time_slot IS NOT NULL)
+      GROUP BY COALESCE(appointment_time, time_slot)
+      ORDER BY bookings DESC
+    `);
+
+    // Customer Satisfaction (mock data since we don't have ratings table)
+    const customerSatisfaction = [
+      { rating: '5 Stars', count: 145, percentage: 58 },
+      { rating: '4 Stars', count: 67, percentage: 27 },
+      { rating: '3 Stars', count: 25, percentage: 10 },
+      { rating: '2 Stars', count: 8, percentage: 3 },
+      { rating: '1 Star', count: 5, percentage: 2 }
+    ];
+
+    // Consultant Performance (mock data)
+    const consultantPerformance = [
+      { name: 'Sarah Johnson', bookings: 89, rating: 4.8, revenue: 44500 },
+      { name: 'Mike Chen', bookings: 76, rating: 4.7, revenue: 38000 },
+      { name: 'Emily Davis', bookings: 65, rating: 4.9, revenue: 32500 },
+      { name: 'David Wilson', bookings: 58, rating: 4.6, revenue: 29000 },
+      { name: 'Lisa Brown', bookings: 52, rating: 4.8, revenue: 26000 }
+    ];
+
+    // Weekly Trends
+    const [weeklyTrends] = await connection.execute(`
+      SELECT 
+        DAYNAME(appointment_date) as day,
+        COUNT(*) as bookings
+      FROM appointments 
+      WHERE appointment_date >= DATE_SUB(NOW(), INTERVAL 4 WEEK)
+      GROUP BY DAYOFWEEK(appointment_date), DAYNAME(appointment_date)
+      ORDER BY DAYOFWEEK(appointment_date)
+    `);
+
+    // Format the data for frontend - only show months with data
+    const formattedBookingsData = bookingsData.map(item => ({
+      month: item.month_name ? item.month_name.substring(0, 3) : item.period,
+      bookings: parseInt(item.bookings),
+      completed: parseInt(item.completed),
+      cancelled: parseInt(item.cancelled)
+    }));
+
+    const formattedServiceTypes = serviceTypes.map(item => ({
+      service: item.service,
+      bookings: parseInt(item.bookings),
+      revenue: parseFloat(item.revenue)
+    }));
+
+    const formattedTimeSlots = timeSlots.map(item => ({
+      slot: item.slot,
+      bookings: parseInt(item.bookings)
+    }));
+
+    const formattedWeeklyTrends = weeklyTrends.map(item => ({
+      day: item.day,
+      bookings: parseInt(item.bookings)
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        monthlyBookings: formattedBookingsData,
+        serviceTypes: formattedServiceTypes,
+        timeSlotPopularity: formattedTimeSlots,
+        customerSatisfaction,
+        consultantPerformance,
+        weeklyTrends: formattedWeeklyTrends
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching consultation analytics:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching consultation analytics',
+      error: error.message
+    });
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
+  }
+});

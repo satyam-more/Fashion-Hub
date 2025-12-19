@@ -55,9 +55,12 @@
 
 .plans-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 30px;
   margin-bottom: 60px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .plan-card {
@@ -67,6 +70,10 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   position: relative;
   transition: transform 0.3s, box-shadow 0.3s;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .plan-card:hover {
@@ -489,12 +496,44 @@
   margin-bottom: 15px;
 }
 
+.qr-code-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  background: linear-gradient(135deg, #fffbf5 0%, #fff8e1 100%);
+  border-radius: 10px;
+  margin: 15px auto;
+  max-width: 180px;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.15);
+  border: 2px solid #d97706;
+}
+
+.qr-code {
+  width: 150px;
+  height: 150px;
+  border-radius: 6px;
+  padding: 5px;
+  background: white;
+  display: block;
+}
+
+.qr-instruction {
+  margin-top: 8px;
+  color: #4a5568;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+}
+
 .upi-details,
 .bank-details {
   background: white;
   padding: 15px;
   border-radius: 8px;
   border-left: 4px solid #d97706;
+  margin-top: 15px;
 }
 
 .upi-details p,

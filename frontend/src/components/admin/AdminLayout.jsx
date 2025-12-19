@@ -1,11 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../../styles/admin/AdminLayout.css';
 
 const AdminLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [adminName, setAdminName] = useState('Admin');
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    // Fetch admin user info
+    const userInfo = localStorage.getItem('userInfo');
+    if (userInfo) {
+      try {
+        const user = JSON.parse(userInfo);
+        setAdminName(user.username || 'Admin');
+      } catch (error) {
+        console.error('Error parsing user info:', error);
+      }
+    }
+  }, []);
 
   const navigationItems = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊', path: '/admin-dashboard' },
@@ -16,6 +30,8 @@ const AdminLayout = ({ children }) => {
     { id: 'orders', label: 'Manage Orders', icon: '🛒', path: '/admin/orders' },
     { id: 'reviews', label: 'Customer Reviews', icon: '💬', path: '/admin/reviews' },
     { id: 'analytics', label: 'Analytics & Reports', icon: '📈', path: '/admin/analytics' },
+    { id: 'sales-analytics', label: 'Sales Analytics', icon: '💰', path: '/admin/sales-analytics' },
+    { id: 'consultation-analytics', label: 'Consultation Analytics', icon: '✂️', path: '/admin/consultation-analytics' },
     { id: 'settings', label: 'Settings', icon: '⚙️', path: '/admin/settings' },
   ];
 
@@ -88,13 +104,14 @@ const AdminLayout = ({ children }) => {
           </div>
           
           <div className="header-right">
-            <button className="notification-btn">
-              🔔
-              <span className="notification-badge">3</span>
-            </button>
+            <Link to="/" className="view-site-btn" title="View User Home Page">
+              🏠 View Site
+            </Link>
             <div className="admin-profile">
-              <span>Admin User</span>
-              <div className="profile-avatar">AU</div>
+              <span>{adminName}</span>
+              <div className="profile-avatar">
+                {adminName.charAt(0).toUpperCase()}
+              </div>
             </div>
           </div>
         </header>
