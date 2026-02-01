@@ -9,7 +9,14 @@ require('dotenv').config();
 const { validateEnvironment } = require('./config/validateEnv');
 validateEnvironment();
 
+// Import logger
+const { getLogger, logEvent } = require('./config/logger');
+
 const app = express();
+
+// Request logging
+const loggers = getLogger();
+loggers.forEach(logger => app.use(logger));
 
 // Security headers with helmet
 app.use(helmet({
@@ -116,9 +123,17 @@ const startServer = async () => {
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
       console.log(`✅ Server running on http://localhost:${PORT}`);
+      logEvent('info', 'Server started successfully', { 
+        port: PORT, 
+        environment: process.env.NODE_ENV || 'development' 
+      });
     });
   } catch (error) {
     console.error("Failed to start server:", error);
+    logEvent('error', 'Failed to start server', { 
+      error: error.message, 
+      stack: error.stack 
+    });
     process.exit(1);
   }
 };
