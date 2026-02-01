@@ -4,11 +4,15 @@ const mysql = require("mysql2/promise");
 const path = require("path");
 require('dotenv').config();
 
+// Validate environment variables before starting
+const { validateEnvironment } = require('./config/validateEnv');
+validateEnvironment();
+
 const app = express();
 
 // Enhanced CORS configuration
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  origin: process.env.FRONTEND_URL,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -24,10 +28,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const createConnection = async () => {
   try {
     const con = await mysql.createConnection({
-      host: process.env.DB_HOST || "localhost",
-      user: process.env.DB_USER || "root",
-      password: process.env.DB_PASSWORD || "",
-      database: process.env.DB_NAME || "fashion_hub"
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME
     });
     console.log("✅ Connected to MySQL database");
     return con;
