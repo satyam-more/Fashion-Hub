@@ -37,10 +37,20 @@ const validateRegistration = [
     .normalizeEmail(),
   
   body('password')
-    .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters long')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number'),
+    .isLength({ min: 8, max: 128 })
+    .withMessage('Password must be between 8 and 128 characters long')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_+=\-\[\]{}|\\:;"'<>,.\/~`])/)
+    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character')
+    .not().matches(/^(.)\1+$/)
+    .withMessage('Password cannot be all the same character')
+    .custom((value) => {
+      // Check for common weak passwords
+      const weakPasswords = ['password', 'Password1!', '12345678', 'Qwerty123!', 'Admin123!'];
+      if (weakPasswords.some(weak => value.toLowerCase().includes(weak.toLowerCase()))) {
+        throw new Error('Password is too common. Please choose a stronger password');
+      }
+      return true;
+    }),
   
   body('phone')
     .optional()
@@ -258,10 +268,24 @@ const validatePasswordChange = [
     .withMessage('Current password is required'),
   
   body('newPassword')
-    .isLength({ min: 6 })
-    .withMessage('New password must be at least 6 characters long')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage('New password must contain at least one uppercase letter, one lowercase letter, and one number'),
+    .isLength({ min: 8, max: 128 })
+    .withMessage('New password must be between 8 and 128 characters long')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_+=\-\[\]{}|\\:;"'<>,.\/~`])/)
+    .withMessage('New password must contain at least one uppercase letter, one lowercase letter, one number, and one special character')
+    .not().matches(/^(.)\1+$/)
+    .withMessage('Password cannot be all the same character')
+    .custom((value, { req }) => {
+      // Check if new password is same as current
+      if (value === req.body.currentPassword) {
+        throw new Error('New password must be different from current password');
+      }
+      // Check for common weak passwords
+      const weakPasswords = ['password', 'Password1!', '12345678', 'Qwerty123!', 'Admin123!'];
+      if (weakPasswords.some(weak => value.toLowerCase().includes(weak.toLowerCase()))) {
+        throw new Error('Password is too common. Please choose a stronger password');
+      }
+      return true;
+    }),
   
   handleValidationErrors
 ];

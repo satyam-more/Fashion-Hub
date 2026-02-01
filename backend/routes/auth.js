@@ -2,22 +2,57 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { validateRegistration, validateLogin } = require("../middleware/validation");
+const { checkPasswordStrength, getPasswordPolicyDescription } = require("../utils/passwordStrength");
 
 module.exports = (con) => {
   const router = express.Router();
+
+  // Password strength check endpoint
+  router.post("/check-password-strength", (req, res) => {
+    try {
+      const { password } = req.body;
+      
+      if (!password) {
+        return res.status(400).json({
+          success: false,
+          error: 'Password is required'
+        });
+      }
+      
+      const strength = checkPasswordStrength(password);
+      
+      res.json({
+        success: true,
+        data: strength
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: 'Failed to check password strength'
+      });
+    }
+  });
+
+  // Get password policy
+  router.get("/password-policy", (req, res) => {
+    try {
+      const policy = getPasswordPolicyDescription();
+      res.json({
+        success: true,
+        data: policy
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get password policy'
+      });
+    }
+  });
 
   // Register route with validation
   router.post("/register", validateRegistration, async (req, res) => {
     try {
       const { username, email, password, role } = req.body;
-
-      // Validate email format
-      if (!isValidEmail(email)) {
-        return res.status(400).json({ error: "Please enter a valid email address" });
-      }
-
-      // Validate password strength
-      if (!isValidPassword(password)) {
         return res.status(400).json({ error: "Password must be at least 6 characters long" });
       }
 
