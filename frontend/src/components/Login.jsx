@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { API_ENDPOINTS } from '../config/api';
 import '../styles/auth/Login.css';
 
 const Login = () => {
@@ -41,7 +42,7 @@ const Login = () => {
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -88,7 +89,7 @@ const Login = () => {
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/otp/send-login-otp", {
+      const res = await fetch(`${API_ENDPOINTS.API}/otp/send-login-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -130,7 +131,7 @@ const Login = () => {
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/otp/verify-login-otp", {
+      const res = await fetch(`${API_ENDPOINTS.API}/otp/verify-login-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
