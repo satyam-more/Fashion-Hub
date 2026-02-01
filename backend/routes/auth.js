@@ -1,33 +1,15 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { validateRegistration, validateLogin } = require("../middleware/validation");
 
 module.exports = (con) => {
   const router = express.Router();
 
-  // Helper function to validate email format
-  const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  // Helper function to validate password strength
-  const isValidPassword = (password) => {
-    return password.length >= 6;
-  };
-
-  // Register route
-  router.post("/register", async (req, res) => {
+  // Register route with validation
+  router.post("/register", validateRegistration, async (req, res) => {
     try {
       const { username, email, password, role } = req.body;
-
-      // Validate input
-      if (!username || !email || !password) {
-        return res.status(400).json({ 
-          error: "All fields are required",
-          required: ["username", "email", "password"]
-        });
-      }
 
       // Validate email format
       if (!isValidEmail(email)) {
@@ -119,22 +101,10 @@ module.exports = (con) => {
     }
   });
 
-  // Login route
-  router.post("/login", async (req, res) => {
+  // Login route with validation
+  router.post("/login", validateLogin, async (req, res) => {
     try {
       const { email, password } = req.body;
-
-      // Validate input
-      if (!email || !password) {
-        return res.status(400).json({ 
-          error: "Email and password are required" 
-        });
-      }
-
-      // Validate email format
-      if (!isValidEmail(email)) {
-        return res.status(400).json({ error: "Please enter a valid email address" });
-      }
 
       // Find user by email (now includes role)
       const [users] = await con.execute(

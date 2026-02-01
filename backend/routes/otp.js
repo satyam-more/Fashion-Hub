@@ -1,5 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const { validateOTP } = require('../middleware/validation');
 
 module.exports = (con) => {
   const router = express.Router();
@@ -19,22 +20,22 @@ module.exports = (con) => {
   };
 
   // Send OTP for login (alias)
-  router.post('/send-login-otp', async (req, res) => {
+  router.post('/send-login-otp', validateOTP, async (req, res) => {
     return sendOTPHandler(req, res);
   });
 
   // Verify OTP for login (alias)
-  router.post('/verify-login-otp', async (req, res) => {
+  router.post('/verify-login-otp', validateOTP, async (req, res) => {
     return verifyOTPHandler(req, res);
   });
 
   // Send OTP to email
-  router.post('/send-otp', async (req, res) => {
+  router.post('/send-otp', validateOTP, async (req, res) => {
     return sendOTPHandler(req, res);
   });
 
   // Verify OTP
-  router.post('/verify-otp', async (req, res) => {
+  router.post('/verify-otp', validateOTP, async (req, res) => {
     return verifyOTPHandler(req, res);
   });
 
