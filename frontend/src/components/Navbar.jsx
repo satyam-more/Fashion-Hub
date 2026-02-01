@@ -45,7 +45,7 @@ const Navbar = () => {
       if (!token) return;
 
       // Fetch cart count
-      const cartResponse = await fetch('http://localhost:5000/api/cart', {
+      const cartResponse = await fetch(API_ENDPOINTS.CART.BASE, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (cartResponse.ok) {
@@ -56,7 +56,7 @@ const Navbar = () => {
       }
 
       // Fetch wishlist count
-      const wishlistResponse = await fetch('http://localhost:5000/api/wishlist', {
+      const wishlistResponse = await fetch(API_ENDPOINTS.WISHLIST.BASE, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (wishlistResponse.ok) {
@@ -101,7 +101,7 @@ const Navbar = () => {
       const token = localStorage.getItem('authToken');
       if (!token) return;
 
-      const response = await fetch('http://localhost:5000/api/memberships/check-status', {
+      const response = await fetch(`${API_ENDPOINTS.API}/memberships/check-status', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -118,7 +118,7 @@ const Navbar = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/products/categories');
+      const response = await fetch(`${API_ENDPOINTS.API}/products/categories');
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -128,7 +128,7 @@ const Navbar = () => {
           const subcategoriesData = {};
           for (const category of data.data) {
             try {
-              const subResponse = await fetch(`http://localhost:5000/api/products/subcategories/${category.id}`);
+              const subResponse = await fetch(`${API_ENDPOINTS.API}/products/subcategories/${category.id}`);
               if (subResponse.ok) {
                 const subData = await subResponse.json();
                 if (subData.success) {

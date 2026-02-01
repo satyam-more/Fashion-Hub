@@ -34,7 +34,7 @@ const CustomTailoring = () => {
     message: ''
   });
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  
 
   const serviceOptions = [
     'Kurti', 'Salwar Suit', 'Palazzo Suit',

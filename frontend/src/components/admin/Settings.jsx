@@ -33,7 +33,7 @@ const Settings = () => {
   const [success, setSuccess] = useState(null);
   const [activeTab, setActiveTab] = useState('general');
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('authToken');

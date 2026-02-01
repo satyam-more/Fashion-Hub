@@ -42,7 +42,7 @@ const SalesAnalytics = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:5000/api/admin/sales-analytics?range=${timeRange}`, {
+      const response = await fetch(`${API_ENDPOINTS.API}/admin/sales-analytics?range=${timeRange}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

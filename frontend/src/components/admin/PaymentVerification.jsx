@@ -13,7 +13,7 @@ const PaymentVerification = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  
 
   useEffect(() => {
     fetchPendingPayments();

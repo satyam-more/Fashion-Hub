@@ -29,7 +29,7 @@ const Profile = () => {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/profile', {
+      const response = await fetch(API_ENDPOINTS.USER.PROFILE, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -74,7 +74,7 @@ const Profile = () => {
     setSaving(true);
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/profile', {
+      const response = await fetch(API_ENDPOINTS.USER.PROFILE, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ const Profile = () => {
   const fetchMembership = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/memberships/my-membership', {
+      const response = await fetch(`${API_ENDPOINTS.API}/memberships/my-membership', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

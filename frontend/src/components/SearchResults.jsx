@@ -22,7 +22,7 @@ const SearchResults = () => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`http://localhost:5000/api/products/search?q=${encodeURIComponent(searchQuery)}`);
+      const response = await fetch(`${API_ENDPOINTS.API}/products/search?q=${encodeURIComponent(searchQuery)}`);
       
       if (response.ok) {
         const data = await response.json();

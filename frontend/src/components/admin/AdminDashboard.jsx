@@ -19,7 +19,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
-  const API_BASE_URL = 'http://localhost:5000/api';
+  
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('authToken');

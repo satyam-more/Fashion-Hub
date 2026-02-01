@@ -12,7 +12,7 @@ const Appointments = () => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  
 
   useEffect(() => {
     fetchAppointments();

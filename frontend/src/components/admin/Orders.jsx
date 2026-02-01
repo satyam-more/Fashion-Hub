@@ -18,7 +18,7 @@ const Orders = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('authToken');

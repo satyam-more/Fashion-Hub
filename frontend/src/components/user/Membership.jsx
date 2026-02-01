@@ -14,7 +14,7 @@ const Membership = () => {
   const [success, setSuccess] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  
 
   useEffect(() => {
     fetchMembershipData();

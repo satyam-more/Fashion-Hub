@@ -46,7 +46,7 @@ const CategoryPage = () => {
   const fetchCategoryData = async () => {
     try {
       // Fetch categories
-      const categoriesResponse = await fetch('http://localhost:5000/api/products/categories');
+      const categoriesResponse = await fetch(`${API_ENDPOINTS.API}/products/categories');
       if (categoriesResponse.ok) {
         const categoriesData = await categoriesResponse.json();
         if (categoriesData.success) {
@@ -59,7 +59,7 @@ const CategoryPage = () => {
           
           if (currentCategory) {
             const subcategoriesResponse = await fetch(
-              `http://localhost:5000/api/products/subcategories/${currentCategory.id}`
+              `${API_ENDPOINTS.API}/products/subcategories/${currentCategory.id}`
             );
             if (subcategoriesResponse.ok) {
               const subcategoriesData = await subcategoriesResponse.json();
@@ -78,7 +78,7 @@ const CategoryPage = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      let url = 'http://localhost:5000/api/products';
+      let url = API_ENDPOINTS.PRODUCTS.BASE;
       const params = new URLSearchParams();
       
       // Only add category filter if it's not "all"

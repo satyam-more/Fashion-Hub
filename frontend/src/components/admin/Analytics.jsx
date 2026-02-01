@@ -18,7 +18,7 @@ const Analytics = () => {
   const [dateRange, setDateRange] = useState('30days');
   const [activeChart, setActiveChart] = useState('sales');
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('authToken');

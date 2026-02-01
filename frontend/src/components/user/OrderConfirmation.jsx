@@ -16,7 +16,7 @@ const OrderConfirmation = () => {
   const fetchOrderDetails = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:5000/api/orders/${orderId}`, {
+      const response = await fetch(`${API_ENDPOINTS.API}/orders/${orderId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

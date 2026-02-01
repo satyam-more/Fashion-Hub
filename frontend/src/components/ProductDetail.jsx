@@ -30,7 +30,7 @@ const ProductDetail = () => {
   const fetchProduct = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5000/api/products/${id}`);
+      const response = await fetch(`${API_ENDPOINTS.API}/products/${id}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -55,7 +55,7 @@ const ProductDetail = () => {
 
   const fetchReviews = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/reviews/product/${id}`);
+      const response = await fetch(`${API_ENDPOINTS.API}/reviews/product/${id}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -85,7 +85,7 @@ const ProductDetail = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/api/cart/add', {
+      const response = await fetch(`${API_ENDPOINTS.API}/cart/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -117,7 +117,7 @@ const ProductDetail = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/api/wishlist/add', {
+      const response = await fetch(`${API_ENDPOINTS.API}/wishlist/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -149,7 +149,7 @@ const ProductDetail = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:5000/api/reviews/product/${id}`, {
+      const response = await fetch(`${API_ENDPOINTS.API}/reviews/product/${id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

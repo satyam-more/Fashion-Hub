@@ -24,7 +24,7 @@ const Wishlist = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/api/wishlist', {
+      const response = await fetch(API_ENDPOINTS.WISHLIST.BASE, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -54,7 +54,7 @@ const Wishlist = () => {
     try {
       const token = localStorage.getItem('authToken');
       
-      const response = await fetch(`http://localhost:5000/api/wishlist/${wishlistId}`, {
+      const response = await fetch(`${API_ENDPOINTS.API}/wishlist/${wishlistId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -76,7 +76,7 @@ const Wishlist = () => {
     try {
       const token = localStorage.getItem('authToken');
       
-      const response = await fetch('http://localhost:5000/api/cart/add', {
+      const response = await fetch(`${API_ENDPOINTS.API}/cart/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

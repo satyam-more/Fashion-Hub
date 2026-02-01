@@ -16,7 +16,7 @@ const Cart = () => {
   const fetchCartItems = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/cart', {
+      const response = await fetch(API_ENDPOINTS.CART.BASE, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -39,7 +39,7 @@ const Cart = () => {
   const updateQuantity = async (cartId, newQuantity) => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:5000/api/cart/update/${cartId}`, {
+      const response = await fetch(`${API_ENDPOINTS.API}/cart/update/${cartId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ const Cart = () => {
   const removeItem = async (cartId) => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:5000/api/cart/remove/${cartId}`, {
+      const response = await fetch(`${API_ENDPOINTS.API}/cart/remove/${cartId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -120,7 +120,7 @@ const Cart = () => {
                     <div className="item-image">
                       {item.images && item.images.length > 0 ? (
                         <img 
-                          src={item.images[0].startsWith('http') ? item.images[0] : `http://localhost:5000/uploads/${item.images[0]}`} 
+                          src={item.images[0].startsWith('http') ? item.images[0] : `${API_ENDPOINTS.UPLOADS.BASE}/${item.images[0]}`} 
                           alt={item.product_name}
                           onError={(e) => {
                             e.target.style.display = 'none';

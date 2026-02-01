@@ -10,7 +10,7 @@ const UPIPayment = ({ orderId, amount, onSuccess, onCancel }) => {
   const [transactionId, setTransactionId] = useState('');
   const [confirming, setConfirming] = useState(false);
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  
 
   useEffect(() => {
     fetchUPIDetails();

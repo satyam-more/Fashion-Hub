@@ -13,7 +13,7 @@ const AppointmentConfirmation = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  
 
   useEffect(() => {
     // Check if appointment data was passed via navigation state

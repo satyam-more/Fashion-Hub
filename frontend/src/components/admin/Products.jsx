@@ -49,7 +49,7 @@ const Products = () => {
   const [uploadedImages, setUploadedImages] = useState([]);
   const [uploading, setUploading] = useState(false);
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  
   const sizeOptions = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
   const baseTypeOptions = ['upperwear', 'bottomwear', 'accessories', 'saree'];
   const fabricOptions = ['Cotton', 'Silk', 'Polyester', 'Cotton Blend', 'Linen', 'Wool', 'Georgette', 'Chiffon', 'Denim'];

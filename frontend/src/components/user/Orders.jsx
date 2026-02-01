@@ -16,7 +16,7 @@ const Orders = () => {
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/orders', {
+      const response = await fetch(API_ENDPOINTS.ORDERS.BASE, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -42,7 +42,7 @@ const Orders = () => {
 
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:5000/api/orders/cancel/${orderId}`, {
+      const response = await fetch(`${API_ENDPOINTS.API}/orders/cancel/${orderId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -165,7 +165,7 @@ const Orders = () => {
                         <div className="item-image">
                           {item.images && item.images.length > 0 ? (
                             <img 
-                              src={item.images[0].startsWith('http') ? item.images[0] : `http://localhost:5000/uploads/${item.images[0]}`} 
+                              src={item.images[0].startsWith('http') ? item.images[0] : `${API_ENDPOINTS.UPLOADS.BASE}/${item.images[0]}`} 
                               alt={item.product_name}
                               onError={(e) => {
                                 e.target.style.display = 'none';

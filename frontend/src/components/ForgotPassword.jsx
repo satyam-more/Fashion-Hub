@@ -48,7 +48,7 @@ const ForgotPassword = () => {
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/otp/forgot-password", {
+      const res = await fetch(`${API_ENDPOINTS.API}/otp/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -113,7 +113,7 @@ const ForgotPassword = () => {
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/otp/reset-password", {
+      const res = await fetch(`${API_ENDPOINTS.API}/otp/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp, newPassword }),
