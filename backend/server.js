@@ -46,6 +46,15 @@ const startServer = async () => {
   try {
     const con = await createConnection();
     
+    // Import rate limiters
+    const { 
+      apiLimiter, 
+      authLimiter, 
+      otpLimiter, 
+      paymentLimiter, 
+      uploadLimiter 
+    } = require('./middleware/rateLimiter');
+    
     // Import routes and pass the connection
     const authRouter = require("./routes/auth")(con);
     const otpRouter = require("./routes/otp")(con);
@@ -62,20 +71,21 @@ const startServer = async () => {
     const customRouter = require("./routes/custom");
     const membershipsRouter = require("./routes/memberships");
     
-    app.use("/api/auth", authRouter);
-    app.use("/api/otp", otpRouter);
-    app.use("/api/products", productRouter);
-    app.use("/api/upload", uploadRouter);
-    app.use("/api/cart", cartRouter);
-    app.use("/api/orders", ordersRouter);
-    app.use("/api/wishlist", wishlistRouter);
-    app.use("/api/profile", profileRouter);
-    app.use("/api/reviews", reviewsRouter);
-    app.use("/api/admin", adminRouter);
-    app.use("/api/email", emailTestRouter);
-    app.use("/api/upi", upiRouter);
-    app.use("/api/custom", customRouter);
-    app.use("/api/memberships", membershipsRouter);
+    // Apply rate limiting to routes
+    app.use("/api/auth", authLimiter, authRouter);
+    app.use("/api/otp", otpLimiter, otpRouter);
+    app.use("/api/products", apiLimiter, productRouter);
+    app.use("/api/upload", uploadLimiter, uploadRouter);
+    app.use("/api/cart", apiLimiter, cartRouter);
+    app.use("/api/orders", paymentLimiter, ordersRouter);
+    app.use("/api/wishlist", apiLimiter, wishlistRouter);
+    app.use("/api/profile", apiLimiter, profileRouter);
+    app.use("/api/reviews", apiLimiter, reviewsRouter);
+    app.use("/api/admin", apiLimiter, adminRouter);
+    app.use("/api/email", apiLimiter, emailTestRouter);
+    app.use("/api/upi", paymentLimiter, upiRouter);
+    app.use("/api/custom", apiLimiter, customRouter);
+    app.use("/api/memberships", apiLimiter, membershipsRouter);
 
     
     const PORT = process.env.PORT || 5000;
