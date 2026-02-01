@@ -1,6 +1,6 @@
 const express = require('express');
 const UploadController = require('../controllers/uploadController');
-const { uploadProductImages, handleUploadError } = require('../middleware/upload');
+const { uploadProductImages, handleUploadError, validateUploadedFiles } = require('../middleware/upload');
 const auth = require('../middleware/auth');
 
 module.exports = () => {
@@ -18,6 +18,7 @@ module.exports = () => {
         next();
       });
     },
+    validateUploadedFiles, // Validate file content after upload
     UploadController.uploadProductImages
   );
 
