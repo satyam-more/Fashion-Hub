@@ -293,17 +293,36 @@
 
 ---
 
-### Task 11: Add HTTPS Redirect ⏳
+### Task 11: Add HTTPS Redirect ✅
 **Priority:** MEDIUM
 **Impact:** Secure data transmission
 
 **Steps:**
-1. Add HTTPS redirect middleware
-2. Configure for production only
-3. Update deployment guide
-4. Test SSL certificate
+1. ✅ Add HTTPS redirect middleware
+2. ✅ Configure for production only
+3. ✅ Add HSTS (HTTP Strict Transport Security) header
+4. ✅ Exclude health check endpoints from redirect
+5. ✅ Add configuration logging
+6. ✅ Update deployment guide
+
+**Features Added:**
+- Automatic HTTP to HTTPS redirect in production (301 permanent)
+- HSTS header with 1-year max-age
+- includeSubDomains and preload directives
+- Health check endpoints exempted (for load balancers)
+- Environment-aware (disabled in development)
+- Checks both req.secure and x-forwarded-proto header
+- Comprehensive logging on startup
+
+**Security Benefits:**
+- Forces encrypted connections in production
+- Prevents man-in-the-middle attacks
+- HSTS prevents SSL stripping attacks
+- Browser remembers to use HTTPS for 1 year
+- Preload eligible for browser HSTS lists
 
 **Estimated Time:** 30 minutes
+**Status:** COMPLETED ✅
 
 ---
 
@@ -377,13 +396,13 @@
 ## 📊 Progress Summary
 
 **Total Tasks:** 15
-**Completed:** 10
+**Completed:** 11
 **In Progress:** 0
-**Pending:** 5
+**Pending:** 4
 
 **Critical Tasks:** 2/3 completed, 1 in progress
 **High Priority:** 4/4 completed ✅
-**Medium Priority:** 3/5 completed
+**Medium Priority:** 4/5 completed
 **Low Priority:** 1/3 completed
 
 ---

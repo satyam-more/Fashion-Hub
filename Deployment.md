@@ -249,7 +249,46 @@ Enable CORS in backend
 
 Never hardcode secrets in React code
 
-⚠️ Common Mistakes
+---
+
+## 🔒 HTTPS Configuration (Backend)
+
+Your Fashion Hub backend automatically enforces HTTPS in production:
+
+### Automatic Features:
+- **HTTP to HTTPS Redirect**: All HTTP requests are automatically redirected to HTTPS (301 permanent)
+- **HSTS Header**: Browsers remember to use HTTPS for 1 year
+- **Development Mode**: HTTPS enforcement is disabled in development for easier testing
+
+### Production Setup:
+
+1. **Set NODE_ENV to production** in your backend .env:
+   ```
+   NODE_ENV=production
+   ```
+
+2. **Ensure SSL Certificate**: Your hosting provider (Railway, Render, etc.) should provide free SSL certificates automatically
+
+3. **Update FRONTEND_URL** to use HTTPS:
+   ```
+   FRONTEND_URL=https://your-frontend.netlify.app
+   ```
+
+4. **Verify HTTPS is working**:
+   - Try accessing your backend with HTTP - it should redirect to HTTPS
+   - Check response headers for `Strict-Transport-Security`
+
+### Health Check Endpoints:
+Health check endpoints (`/health`, `/api/health`) are exempted from HTTPS redirect to allow load balancers to check server status.
+
+### Security Benefits:
+- ✅ Encrypted data transmission
+- ✅ Protection against man-in-the-middle attacks
+- ✅ Prevention of SSL stripping attacks
+- ✅ Browser-enforced HTTPS for 1 year
+- ✅ Eligible for HSTS preload lists
+
+---⚠️ Common Mistakes
 ❌ Using http://localhost:3000 in production
 ❌ Forgetting to rebuild after changing API URL
 ❌ Wrong publish directory (must be dist)

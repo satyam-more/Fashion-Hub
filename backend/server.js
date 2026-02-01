@@ -12,7 +12,15 @@ validateEnvironment();
 // Import logger
 const { getLogger, logEvent } = require('./config/logger');
 
+// Import HTTPS redirect middleware
+const { httpsRedirect, hsts, logHttpsConfig } = require('./middleware/httpsRedirect');
+
 const app = express();
+
+// HTTPS redirect (must be before other middleware)
+app.use(httpsRedirect);
+app.use(hsts);
+logHttpsConfig();
 
 // Request logging
 const loggers = getLogger();
