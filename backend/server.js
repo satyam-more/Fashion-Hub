@@ -15,6 +15,9 @@ const { getLogger, logEvent } = require('./config/logger');
 // Import HTTPS redirect middleware
 const { httpsRedirect, hsts, logHttpsConfig } = require('./middleware/httpsRedirect');
 
+// Import database security
+const { logSecurityStatus } = require('./config/dbSecurity');
+
 const app = express();
 
 // HTTPS redirect (must be before other middleware)
@@ -66,6 +69,7 @@ const createConnection = async () => {
       database: process.env.DB_NAME
     });
     console.log("✅ Connected to MySQL database");
+    logSecurityStatus(); // Log database security status
     return con;
   } catch (err) {
     console.error("❌ Database connection failed:", err);
