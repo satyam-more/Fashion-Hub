@@ -223,7 +223,7 @@ module.exports = (con) => {
           username: user.username,
           role: user.role
         },
-        process.env.JWT_SECRET || "fallback-secret-key",
+        process.env.JWT_SECRET,
         { expiresIn: "7d" }
       );
 

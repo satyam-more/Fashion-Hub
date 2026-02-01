@@ -92,7 +92,7 @@ module.exports = (con) => {
           username: username.trim(),
           role: userRole
         },
-        process.env.JWT_SECRET || "fallback-secret-key",
+        process.env.JWT_SECRET,
         { expiresIn: "7d" }
       );
 
@@ -162,7 +162,7 @@ module.exports = (con) => {
           username: user.username,
           role: user.role
         },
-        process.env.JWT_SECRET || "fallback-secret-key",
+        process.env.JWT_SECRET,
         { expiresIn: "7d" }
       );
 
@@ -279,7 +279,7 @@ module.exports = (con) => {
       return res.status(401).json({ error: "Access token required" });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET || "fallback-secret-key", (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
       if (err) {
         return res.status(403).json({ error: "Invalid or expired token" });
       }
