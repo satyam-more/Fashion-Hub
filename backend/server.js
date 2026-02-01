@@ -76,6 +76,7 @@ const startServer = async () => {
     } = require('./middleware/rateLimiter');
     
     // Import routes and pass the connection
+    const healthRouter = require("./routes/health")(con);
     const authRouter = require("./routes/auth")(con);
     const otpRouter = require("./routes/otp")(con);
     const productRouter = require("./routes/products")(con);
@@ -90,6 +91,10 @@ const startServer = async () => {
     const upiRouter = require("./routes/upi")(con);
     const customRouter = require("./routes/custom");
     const membershipsRouter = require("./routes/memberships");
+    
+    // Health check endpoint (no rate limiting for monitoring)
+    app.use("/health", healthRouter);
+    app.use("/api/health", healthRouter);
     
     // Apply rate limiting to routes
     app.use("/api/auth", authLimiter, authRouter);
