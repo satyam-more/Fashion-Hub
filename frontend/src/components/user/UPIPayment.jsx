@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../../config/api';
 import '../../styles/user/UPIPayment.css';
 
 const UPIPayment = ({ orderId, amount, onSuccess, onCancel }) => {
@@ -27,7 +28,7 @@ const UPIPayment = ({ orderId, amount, onSuccess, onCancel }) => {
 
   const fetchUPIDetails = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/upi/details`);
+      const response = await axios.get(`${API_ENDPOINTS.API}/upi/details`);
       if (response.data.success) {
         setUpiDetails(response.data.data);
       }
@@ -39,7 +40,7 @@ const UPIPayment = ({ orderId, amount, onSuccess, onCancel }) => {
   const generatePaymentUrls = async () => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/upi/generate-payment-url`,
+        `${API_ENDPOINTS.API}/upi/generate-payment-url`,
         {
           amount: parseFloat(amount),
           orderId: orderId,
@@ -83,7 +84,7 @@ const UPIPayment = ({ orderId, amount, onSuccess, onCancel }) => {
 
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/upi/confirm-payment`,
+        `${API_ENDPOINTS.API}/upi/confirm-payment`,
         {
           orderId: orderId,
           transactionId: transactionId.trim(),

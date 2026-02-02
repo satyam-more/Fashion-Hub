@@ -64,13 +64,28 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // MySQL connection with promise support
 const createConnection = async () => {
   try {
-    const con = await mysql.createConnection({
+    const connectionConfig = {
       host: process.env.DB_HOST,
+      port: process.env.DB_PORT || 3306,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME
-    });
+      database: process.env.DB_NAME,
+      connectTimeout: 20000, // 20 seconds timeout
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 0
+    };
+
+    // Add SSL for Aiven cloud database
+    if (process.env.DB_HOST && process.env.DB_HOST.includes('aivencloud.com')) {
+      connectionConfig.ssl = {
+        rejectUnauthorized: false
+      };
+      console.log('🔒 SSL enabled for Aiven connection');
+    }
+
+    const con = await mysql.createConnection(connectionConfig);
     console.log("✅ Connected to MySQL database");
+    console.log(`📍 Database: ${process.env.DB_HOST}:${process.env.DB_PORT || 3306}`);
     logSecurityStatus(); // Log database security status
     return con;
   } catch (err) {
@@ -90,7 +105,8 @@ const startServer = async () => {
       authLimiter, 
       otpLimiter, 
       paymentLimiter, 
-      uploadLimiter 
+      uploadLimiter,
+      adminDashboardLimiter
     } = require('./middleware/rateLimiter');
     
     // Import routes and pass the connection
@@ -138,7 +154,7 @@ const startServer = async () => {
     app.use("/api/wishlist", apiLimiter, wishlistRouter);
     app.use("/api/profile", apiLimiter, profileRouter);
     app.use("/api/reviews", apiLimiter, reviewsRouter);
-    app.use("/api/admin", apiLimiter, adminRouter);
+    app.use("/api/admin", adminDashboardLimiter, adminRouter);
     app.use("/api/email", apiLimiter, emailTestRouter);
     app.use("/api/upi", paymentLimiter, upiRouter);
     app.use("/api/custom", apiLimiter, customRouter);

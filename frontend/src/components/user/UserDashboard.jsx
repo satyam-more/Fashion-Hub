@@ -35,7 +35,7 @@ const UserDashboard = () => {
         return;
       }
       
-      const response = await fetch(`${API_ENDPOINTS.API}/profile/stats', {
+      const response = await fetch(`${API_ENDPOINTS.API}/profile/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -54,7 +54,7 @@ const UserDashboard = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${API_ENDPOINTS.API}/products/categories');
+      const response = await fetch(`${API_ENDPOINTS.API}/products/categories`);
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -78,7 +78,7 @@ const UserDashboard = () => {
 
       console.log('Adding to cart:', { productId, size }); // Debug log
 
-      const response = await fetch(`${API_ENDPOINTS.API}/cart/add', {
+      const response = await fetch(`${API_ENDPOINTS.API}/cart/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ const UserDashboard = () => {
         return;
       }
 
-      const response = await fetch(`${API_ENDPOINTS.API}/wishlist/add', {
+      const response = await fetch(`${API_ENDPOINTS.API}/wishlist/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

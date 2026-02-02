@@ -33,7 +33,6 @@ import Products from "./components/admin/Products";
 import Users from "./components/admin/Users";
 import AdminOrders from "./components/admin/Orders";
 import Reviews from "./components/admin/Reviews";
-import Settings from "./components/admin/Settings";
 import Analytics from "./components/admin/AnalyticsEnhanced";
 import SalesAnalytics from "./components/admin/SalesAnalytics";
 import ConsultationAnalytics from "./components/admin/ConsultationAnalytics";
@@ -177,13 +176,6 @@ function App() {
           <Route path="/admin/reviews" element={
             <ProtectedRoute allowedRoles={['admin']}>
               <Reviews />
-            </ProtectedRoute>
-          } />
-          
-          {/* Admin Settings Route */}
-          <Route path="/admin/settings" element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <Settings />
             </ProtectedRoute>
           } />
           

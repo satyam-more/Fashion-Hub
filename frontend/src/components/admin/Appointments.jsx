@@ -4,6 +4,7 @@ import AdminLayout from './AdminLayout';
 import '../../styles/admin/Appointments.css';
 import '../../styles/admin/ExportButton.css';
 import { exportAppointmentsReport } from '../../utils/pdfExport';
+import { API_ENDPOINTS } from '../../config/api';
 
 const Appointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -29,8 +30,8 @@ const Appointments = () => {
   const fetchAppointments = async () => {
     try {
       setLoading(true);
-      console.log('Fetching appointments from:', `${API_BASE_URL}/custom/admin/appointments`);
-      const response = await axios.get(`${API_BASE_URL}/custom/admin/appointments`, {
+      console.log('Fetching appointments from:', `${API_ENDPOINTS.API}/custom/admin/appointments`);
+      const response = await axios.get(`${API_ENDPOINTS.API}/custom/admin/appointments`, {
         headers: getAuthHeaders()
       });
       console.log('Appointments response:', response.data);
@@ -50,7 +51,7 @@ const Appointments = () => {
   const handleApprove = async (appointmentId) => {
     try {
       const response = await axios.patch(
-        `${API_BASE_URL}/custom/appointments/${appointmentId}/approve`,
+        `${API_ENDPOINTS.API}/custom/appointments/${appointmentId}/approve`,
         {},
         { headers: getAuthHeaders() }
       );
@@ -71,7 +72,7 @@ const Appointments = () => {
     try {
       console.log('Rejecting appointment:', appointmentId);
       const response = await axios.patch(
-        `${API_BASE_URL}/custom/appointments/${appointmentId}/cancel`,
+        `${API_ENDPOINTS.API}/custom/appointments/${appointmentId}/cancel`,
         {},
         { headers: getAuthHeaders() }
       );

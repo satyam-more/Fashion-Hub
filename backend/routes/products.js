@@ -1,6 +1,7 @@
 const express = require('express');
 const ProductController = require('../controllers/productController');
 const { authenticateToken, authorizeAdmin } = require('../middleware/auth');
+const { searchLimiter } = require('../middleware/rateLimiter');
 
 module.exports = (connection) => {
   const router = express.Router();
@@ -27,8 +28,8 @@ module.exports = (connection) => {
   // GET /api/products/subcategories/:categoryId - Get subcategories by category
   router.get('/subcategories/:categoryId', ProductController.getSubcategories);
 
-  // GET /api/products/search - Search products
-  router.get('/search', ProductController.searchProducts);
+  // GET /api/products/search - Search products (with rate limiting)
+  router.get('/search', searchLimiter, ProductController.searchProducts);
 
   // GET /api/products/:id - Get single product by ID
   router.get('/:id', ProductController.getProductById);

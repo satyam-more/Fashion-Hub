@@ -85,7 +85,7 @@ const ProductDetail = () => {
         return;
       }
 
-      const response = await fetch(`${API_ENDPOINTS.API}/cart/add', {
+      const response = await fetch(`${API_ENDPOINTS.API}/cart/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -117,7 +117,7 @@ const ProductDetail = () => {
         return;
       }
 
-      const response = await fetch(`${API_ENDPOINTS.API}/wishlist/add', {
+      const response = await fetch(`${API_ENDPOINTS.API}/wishlist/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../Navbar';
 import Footer from '../Footer';
+import { API_ENDPOINTS } from '../../config/api';
 import '../../styles/user/AppointmentConfirmation.css';
 
 const AppointmentConfirmation = () => {
@@ -43,7 +44,7 @@ const AppointmentConfirmation = () => {
       console.log('Fetching appointment:', appointmentId);
       
       const response = await axios.get(
-        `${API_BASE_URL}/custom/appointments/${appointmentId}`,
+        `${API_ENDPOINTS.API}/custom/appointments/${appointmentId}`,
         { headers: getAuthHeaders() }
       );
 

@@ -4,6 +4,7 @@ import AdminLayout from './AdminLayout';
 import '../../styles/admin/Users.css';
 import '../../styles/admin/ExportButton.css';
 import { exportUsersReport } from '../../utils/pdfExport';
+import { API_ENDPOINTS } from '../../config/api';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -45,7 +46,7 @@ const Users = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_BASE_URL}/admin/users`, {
+      const response = await axios.get(`${API_ENDPOINTS.API}/admin/users`, {
         headers: getAuthHeaders()
       });
       
@@ -100,13 +101,13 @@ const Users = () => {
       let response;
       if (editingUser) {
         response = await axios.put(
-          `${API_BASE_URL}/admin/users/${editingUser.id}`,
+          `${API_ENDPOINTS.API}/admin/users/${editingUser.id}`,
           formData,
           { headers: getAuthHeaders() }
         );
       } else {
         response = await axios.post(
-          `${API_BASE_URL}/admin/users`,
+          `${API_ENDPOINTS.API}/admin/users`,
           formData,
           { headers: getAuthHeaders() }
         );
@@ -146,7 +147,7 @@ const Users = () => {
 
     try {
       const response = await axios.delete(
-        `${API_BASE_URL}/admin/users/${userId}`,
+        `${API_ENDPOINTS.API}/admin/users/${userId}`,
         { headers: getAuthHeaders() }
       );
 
@@ -164,7 +165,7 @@ const Users = () => {
     try {
       const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
       const response = await axios.patch(
-        `${API_BASE_URL}/admin/users/${userId}/status`,
+        `${API_ENDPOINTS.API}/admin/users/${userId}/status`,
         { status: newStatus },
         { headers: getAuthHeaders() }
       );

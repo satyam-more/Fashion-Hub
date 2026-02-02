@@ -84,11 +84,39 @@ const uploadLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Admin dashboard rate limiter - 200 requests per 15 minutes (more lenient for dashboard)
+const adminDashboardLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // Limit each IP to 200 requests per windowMs
+  message: {
+    success: false,
+    error: 'Too many dashboard requests, please try again later.',
+    retryAfter: '15 minutes'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Search rate limiter - 60 searches per minute (allows for debounced searches)
+const searchLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 60, // Limit each IP to 60 search requests per minute
+  message: {
+    success: false,
+    error: 'Too many search requests, please slow down.',
+    retryAfter: '1 minute'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 module.exports = {
   apiLimiter,
   authLimiter,
   otpLimiter,
   paymentLimiter,
   passwordResetLimiter,
-  uploadLimiter
+  uploadLimiter,
+  adminDashboardLimiter,
+  searchLimiter
 };

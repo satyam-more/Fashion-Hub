@@ -4,6 +4,7 @@ import AdminLayout from './AdminLayout';
 import RevenueChart from './charts/RevenueChart';
 import TopProductsChart from './charts/TopProductsChart';
 import CategoryChart from './charts/CategoryChart';
+import { API_ENDPOINTS } from '../../config/api';
 import '../../styles/admin/Analytics.css';
 
 const Analytics = () => {
@@ -38,11 +39,11 @@ const Analytics = () => {
       setError(null);
       
       const [overviewRes, salesRes, productsRes, customersRes, categoryRes] = await Promise.all([
-        axios.get(`${API_BASE_URL}/admin/analytics/overview?dateRange=${dateRange}`, { headers: getAuthHeaders() }),
-        axios.get(`${API_BASE_URL}/admin/analytics/sales-chart?dateRange=${dateRange}`, { headers: getAuthHeaders() }),
-        axios.get(`${API_BASE_URL}/admin/analytics/top-products?dateRange=${dateRange}`, { headers: getAuthHeaders() }),
-        axios.get(`${API_BASE_URL}/admin/analytics/customer-segments`, { headers: getAuthHeaders() }),
-        axios.get(`${API_BASE_URL}/admin/analytics/category-sales?dateRange=${dateRange}`, { headers: getAuthHeaders() })
+        axios.get(`${API_ENDPOINTS.API}/admin/analytics/overview?dateRange=${dateRange}`, { headers: getAuthHeaders() }),
+        axios.get(`${API_ENDPOINTS.API}/admin/analytics/sales-chart?dateRange=${dateRange}`, { headers: getAuthHeaders() }),
+        axios.get(`${API_ENDPOINTS.API}/admin/analytics/top-products?dateRange=${dateRange}`, { headers: getAuthHeaders() }),
+        axios.get(`${API_ENDPOINTS.API}/admin/analytics/customer-segments`, { headers: getAuthHeaders() }),
+        axios.get(`${API_ENDPOINTS.API}/admin/analytics/category-sales?dateRange=${dateRange}`, { headers: getAuthHeaders() })
       ]);
 
       setAnalyticsData({

@@ -86,6 +86,19 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
+  min-height: 80px;
+}
+
+.brand {
+  flex: 1;
+  overflow: hidden;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar.closed .brand {
+  opacity: 0;
+  width: 0;
 }
 
 .brand h2 {
@@ -93,30 +106,41 @@ body {
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 0.25rem;
+  white-space: nowrap;
 }
 
 .brand span {
   color: rgba(255, 255, 255, 0.8);
   font-size: 0.875rem;
-}
-
-.sidebar.closed .brand span {
-  display: none;
+  white-space: nowrap;
 }
 
 .sidebar-toggle {
-  background: none;
-  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
   color: white;
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 6px;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
   font-size: 1.2rem;
+  min-width: 36px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  position: relative;
 }
 
 .sidebar-toggle:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
+}
+
+.sidebar-toggle:active {
+  transform: scale(0.95);
 }
 
 /* Navigation Styles */

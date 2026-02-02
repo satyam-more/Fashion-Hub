@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import { API_ENDPOINTS } from '../config/api';
 import '../styles/components/CategoryPage.css';
 
 const CategoryPage = () => {
@@ -46,7 +47,7 @@ const CategoryPage = () => {
   const fetchCategoryData = async () => {
     try {
       // Fetch categories
-      const categoriesResponse = await fetch(`${API_ENDPOINTS.API}/products/categories');
+      const categoriesResponse = await fetch(`${API_ENDPOINTS.API}/products/categories`);
       if (categoriesResponse.ok) {
         const categoriesData = await categoriesResponse.json();
         if (categoriesData.success) {

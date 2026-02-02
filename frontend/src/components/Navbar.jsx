@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/components/Navbar.css';
+import { API_ENDPOINTS } from '../config/api';
+import { debounce } from '../utils/debounce';
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
@@ -8,12 +10,47 @@ const Navbar = () => {
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState({});
   const [isPremium, setIsPremium] = useState(false);
   const [isHomePage, setIsHomePage] = useState(false);
   const navigate = useNavigate();
   const location = window.location;
+  const searchRef = useRef(null);
+
+  // Debounced search function - waits 500ms after user stops typing
+  const debouncedSearch = useCallback(
+    debounce(async (query) => {
+      if (query.trim().length < 2) {
+        setSearchSuggestions([]);
+        setShowSuggestions(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_ENDPOINTS.PRODUCTS.SEARCH}?q=${encodeURIComponent(query)}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setSearchSuggestions(data.data.slice(0, 5)); // Show top 5 suggestions
+            setShowSuggestions(true);
+          }
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+      }
+    }, 500), // 500ms delay
+    []
+  );
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    debouncedSearch(value);
+  };
 
   useEffect(() => {
     // Check authentication status
@@ -85,8 +122,27 @@ const Navbar = () => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setShowSuggestions(false);
     }
   };
+
+  const handleSuggestionClick = (productId) => {
+    navigate(`/product/${productId}`);
+    setSearchQuery('');
+    setShowSuggestions(false);
+  };
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleMouseEnter = (dropdown) => {
     setActiveDropdown(dropdown);
@@ -101,7 +157,7 @@ const Navbar = () => {
       const token = localStorage.getItem('authToken');
       if (!token) return;
 
-      const response = await fetch(`${API_ENDPOINTS.API}/memberships/check-status', {
+      const response = await fetch(`${API_ENDPOINTS.API}/memberships/check-status`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -118,7 +174,7 @@ const Navbar = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${API_ENDPOINTS.API}/products/categories');
+      const response = await fetch(`${API_ENDPOINTS.API}/products/categories`);
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -163,18 +219,36 @@ const Navbar = () => {
           <div className="navbar-right-actions">
             {/* Search Bar - Hidden on Home Page */}
             {!isHomePage && (
-              <form onSubmit={handleSearch} className="navbar-search-form">
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="navbar-search-input"
-                />
-                <button type="submit" className="navbar-search-btn">
-                  🔍
-                </button>
-              </form>
+              <div className="navbar-search-container" ref={searchRef}>
+                <form onSubmit={handleSearch} className="navbar-search-form">
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    className="navbar-search-input"
+                  />
+                  <button type="submit" className="navbar-search-btn">
+                    🔍
+                  </button>
+                </form>
+                
+                {/* Search Suggestions Dropdown */}
+                {showSuggestions && searchSuggestions.length > 0 && (
+                  <div className="search-suggestions">
+                    {searchSuggestions.map((product) => (
+                      <div
+                        key={product.id}
+                        className="search-suggestion-item"
+                        onClick={() => handleSuggestionClick(product.id)}
+                      >
+                        <span className="suggestion-name">{product.name}</span>
+                        <span className="suggestion-price">₹{product.price}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
 
             {/* Cart */}

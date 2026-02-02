@@ -4,6 +4,7 @@ import AdminLayout from './AdminLayout';
 import '../../styles/admin/Products.css';
 import '../../styles/admin/ExportButton.css';
 import { exportProductsReport } from '../../utils/pdfExport';
+import { API_ENDPOINTS } from '../../config/api';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -117,8 +118,8 @@ const Products = () => {
       
       // Fetch products, categories in parallel
       const [productsRes, categoriesRes] = await Promise.all([
-        axios.get(`${API_BASE_URL}/products`),
-        axios.get(`${API_BASE_URL}/products/categories`)
+        axios.get(`${API_ENDPOINTS.API}/products`),
+        axios.get(`${API_ENDPOINTS.API}/products/categories`)
       ]);
 
       if (productsRes.data.success) {
@@ -153,7 +154,7 @@ const Products = () => {
       const category = categories.find(cat => cat.name === categoryName);
       if (!category) return;
 
-      const response = await axios.get(`${API_BASE_URL}/products/subcategories/${category.id}`);
+      const response = await axios.get(`${API_ENDPOINTS.API}/products/subcategories/${category.id}`);
       if (response.data.success) {
         setSubcategories(response.data.data || []);
       }
@@ -260,7 +261,7 @@ const Products = () => {
       });
 
       const response = await axios.post(
-        `${API_BASE_URL}/upload/products`,
+        `${API_ENDPOINTS.API}/upload/products`,
         formData,
         {
           headers: {
@@ -272,7 +273,7 @@ const Products = () => {
 
       if (response.data.success) {
         const imageUrls = response.data.data.images.map(img => 
-          `${API_BASE_URL.replace('/api', '')}${img.url}`
+          `${API_ENDPOINTS.BASE_URL}${img.url}`
         );
         setUploadedImages(imageUrls);
         return imageUrls;
@@ -321,7 +322,7 @@ const Products = () => {
         const category = categories.find(cat => cat.name === value);
         if (category) {
           try {
-            const response = await axios.get(`${API_BASE_URL}/products/subcategories/${category.id}`);
+            const response = await axios.get(`${API_ENDPOINTS.API}/products/subcategories/${category.id}`);
             if (response.data.success) {
               setFilterSubcategories(response.data.data || []);
             }
@@ -403,14 +404,14 @@ const Products = () => {
       if (editingProduct) {
         // Update existing product
         response = await axios.put(
-          `${API_BASE_URL}/products/${editingProduct.id}`,
+          `${API_ENDPOINTS.API}/products/${editingProduct.id}`,
           productData,
           { headers: getAuthHeaders() }
         );
       } else {
         // Create new product
         response = await axios.post(
-          `${API_BASE_URL}/products`,
+          `${API_ENDPOINTS.API}/products`,
           productData,
           { headers: getAuthHeaders() }
         );
@@ -476,7 +477,7 @@ const Products = () => {
       }
 
       const response = await axios.delete(
-        `${API_BASE_URL}/products/${productId}`,
+        `${API_ENDPOINTS.API}/products/${productId}`,
         { headers: getAuthHeaders() }
       );
 

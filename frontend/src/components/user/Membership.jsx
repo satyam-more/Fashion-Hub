@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../Navbar';
 import Footer from '../Footer';
+import { API_ENDPOINTS } from '../../config/api';
 import '../../styles/user/Membership.css';
 
 const Membership = () => {
@@ -32,10 +33,10 @@ const Membership = () => {
     try {
       setLoading(true);
       const [membershipRes, benefitsRes] = await Promise.all([
-        axios.get(`${API_BASE_URL}/memberships/my-membership`, {
+        axios.get(`${API_ENDPOINTS.API}/memberships/my-membership`, {
           headers: getAuthHeaders()
         }),
-        axios.get(`${API_BASE_URL}/memberships/benefits`)
+        axios.get(`${API_ENDPOINTS.API}/memberships/benefits`)
       ]);
 
       if (membershipRes.data.success) {
@@ -64,7 +65,7 @@ const Membership = () => {
     try {
       setLoading(true);
       const response = await axios.post(
-        `${API_BASE_URL}/memberships/upgrade-premium`,
+        `${API_ENDPOINTS.API}/memberships/upgrade-premium`,
         {
           payment_method: 'upi_direct',
           transaction_id: transactionId

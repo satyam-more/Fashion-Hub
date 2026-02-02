@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../Navbar';
 import Footer from '../Footer';
+import { API_ENDPOINTS } from '../../config/api';
 import '../../styles/user/CustomTailoring.css';
 
 const CustomTailoring = () => {
@@ -102,7 +103,7 @@ const CustomTailoring = () => {
 
   const fetchMembership = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/memberships/my-membership`, {
+      const response = await axios.get(`${API_ENDPOINTS.API}/memberships/my-membership`, {
         headers: getAuthHeaders()
       });
       if (response.data.success) {
@@ -320,7 +321,7 @@ const CustomTailoring = () => {
       setError(null);
 
       const response = await axios.post(
-        `${API_BASE_URL}/custom/appointments`,
+        `${API_ENDPOINTS.API}/custom/appointments`,
         {
           ...formData,
           paymentMethod: selectedPaymentMethod,
@@ -333,7 +334,7 @@ const CustomTailoring = () => {
         const newAppointmentId = response.data.data.appointment_id;
         
         const appointmentResponse = await axios.get(
-          `${API_BASE_URL}/custom/appointments/${newAppointmentId}`,
+          `${API_ENDPOINTS.API}/custom/appointments/${newAppointmentId}`,
           { headers: getAuthHeaders() }
         );
 

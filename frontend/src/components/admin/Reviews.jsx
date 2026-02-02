@@ -4,6 +4,7 @@ import AdminLayout from './AdminLayout';
 import '../../styles/admin/Reviews.css';
 import '../../styles/admin/ExportButton.css';
 import { exportReviewsReport } from '../../utils/pdfExport';
+import { API_ENDPOINTS } from '../../config/api';
 
 const Reviews = () => {
   const [reviews, setReviews] = useState([]);
@@ -33,7 +34,7 @@ const Reviews = () => {
   const fetchReviews = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_BASE_URL}/reviews/admin`, {
+      const response = await axios.get(`${API_ENDPOINTS.API}/reviews/admin`, {
         headers: getAuthHeaders()
       });
       
@@ -59,7 +60,7 @@ const Reviews = () => {
   const updateReviewStatus = async (reviewId, status) => {
     try {
       const response = await axios.patch(
-        `${API_BASE_URL}/reviews/${reviewId}/status`,
+        `${API_ENDPOINTS.API}/reviews/${reviewId}/status`,
         { status },
         { headers: getAuthHeaders() }
       );
@@ -81,7 +82,7 @@ const Reviews = () => {
 
     try {
       const response = await axios.delete(
-        `${API_BASE_URL}/reviews/${reviewId}`,
+        `${API_ENDPOINTS.API}/reviews/${reviewId}`,
         { headers: getAuthHeaders() }
       );
 

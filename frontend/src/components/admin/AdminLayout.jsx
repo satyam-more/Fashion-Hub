@@ -32,7 +32,6 @@ const AdminLayout = ({ children }) => {
     { id: 'analytics', label: 'Analytics & Reports', icon: '📈', path: '/admin/analytics' },
     { id: 'sales-analytics', label: 'Sales Analytics', icon: '💰', path: '/admin/sales-analytics' },
     { id: 'consultation-analytics', label: 'Consultation Analytics', icon: '✂️', path: '/admin/consultation-analytics' },
-    { id: 'settings', label: 'Settings', icon: '⚙️', path: '/admin/settings' },
   ];
 
   const isActiveRoute = (path) => {

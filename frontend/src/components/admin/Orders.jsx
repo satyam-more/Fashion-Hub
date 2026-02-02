@@ -4,6 +4,7 @@ import AdminLayout from './AdminLayout';
 import '../../styles/admin/Orders.css';
 import '../../styles/admin/ExportButton.css';
 import { exportOrdersReport } from '../../utils/pdfExport';
+import { API_ENDPOINTS } from '../../config/api';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -35,7 +36,7 @@ const Orders = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_BASE_URL}/admin/orders`, {
+      const response = await axios.get(`${API_ENDPOINTS.API}/admin/orders`, {
         headers: getAuthHeaders()
       });
       
@@ -65,10 +66,10 @@ const Orders = () => {
       setError(null);
       setSuccess(null);
       
-      console.log('📡 Sending request to:', `${API_BASE_URL}/admin/orders/${orderId}/status`);
+      console.log('📡 Sending request to:', `${API_ENDPOINTS.API}/admin/orders/${orderId}/status`);
       
       const response = await axios.patch(
-        `${API_BASE_URL}/admin/orders/${orderId}/status`,
+        `${API_ENDPOINTS.API}/admin/orders/${orderId}/status`,
         { status: newStatus },
         { headers: getAuthHeaders() }
       );
@@ -102,7 +103,7 @@ const Orders = () => {
 
   const viewOrderDetails = async (orderId) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/admin/orders/${orderId}`, {
+      const response = await axios.get(`${API_ENDPOINTS.API}/admin/orders/${orderId}`, {
         headers: getAuthHeaders()
       });
       

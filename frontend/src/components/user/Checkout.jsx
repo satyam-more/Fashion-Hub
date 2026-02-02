@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../Navbar';
 import UPIPayment from './UPIPayment';
+import { API_ENDPOINTS } from '../../config/api';
 import '../../styles/user/Checkout.css';
 
 const Checkout = () => {
@@ -48,7 +49,7 @@ const Checkout = () => {
 
   const fetchCartItems = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/cart`, {
+      const response = await axios.get(`${API_ENDPOINTS.API}/cart`, {
         headers: getAuthHeaders()
       });
       
@@ -71,7 +72,7 @@ const Checkout = () => {
 
   const loadUserProfile = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/profile`, {
+      const response = await axios.get(`${API_ENDPOINTS.API}/profile`, {
         headers: getAuthHeaders()
       });
       
@@ -144,7 +145,7 @@ const Checkout = () => {
       };
 
       const response = await axios.post(
-        `${API_BASE_URL}/orders`,
+        `${API_ENDPOINTS.API}/orders`,
         orderData,
         { headers: getAuthHeaders() }
       );
@@ -159,7 +160,7 @@ const Checkout = () => {
         }
 
         // For COD, clear cart and navigate
-        await axios.delete(`${API_BASE_URL}/cart/clear`, {
+        await axios.delete(`${API_ENDPOINTS.API}/cart/clear`, {
           headers: getAuthHeaders()
         });
 
@@ -177,7 +178,7 @@ const Checkout = () => {
   const handleUPIPaymentSuccess = async (paymentData) => {
     try {
       // Clear cart
-      await axios.delete(`${API_BASE_URL}/cart/clear`, {
+      await axios.delete(`${API_ENDPOINTS.API}/cart/clear`, {
         headers: getAuthHeaders()
       });
 

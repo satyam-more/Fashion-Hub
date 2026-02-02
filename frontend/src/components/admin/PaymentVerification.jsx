@@ -4,6 +4,7 @@ import AdminLayout from './AdminLayout';
 import '../../styles/admin/PaymentVerification.css';
 import '../../styles/admin/ExportButton.css';
 import { exportPaymentsReport } from '../../utils/pdfExport';
+import { API_ENDPOINTS } from '../../config/api';
 
 const PaymentVerification = () => {
   const [pendingPayments, setPendingPayments] = useState([]);
@@ -37,7 +38,7 @@ const PaymentVerification = () => {
   const fetchPendingPayments = async () => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/admin/payments/all`,
+        `${API_ENDPOINTS.API}/admin/payments/all`,
         { headers: getAuthHeaders() }
       );
       if (response.data.success) {
@@ -53,7 +54,7 @@ const PaymentVerification = () => {
   const fetchStats = async () => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/admin/payments/stats`,
+        `${API_ENDPOINTS.API}/admin/payments/stats`,
         { headers: getAuthHeaders() }
       );
       if (response.data.success) {
@@ -72,7 +73,7 @@ const PaymentVerification = () => {
     setActionLoading(true);
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/admin/payments/${orderId}/approve`,
+        `${API_ENDPOINTS.API}/admin/payments/${orderId}/approve`,
         {},
         { headers: getAuthHeaders() }
       );
@@ -104,7 +105,7 @@ const PaymentVerification = () => {
     setActionLoading(true);
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/admin/payments/${orderId}/reject`,
+        `${API_ENDPOINTS.API}/admin/payments/${orderId}/reject`,
         { reason: rejectReason },
         { headers: getAuthHeaders() }
       );

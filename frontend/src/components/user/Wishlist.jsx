@@ -76,7 +76,7 @@ const Wishlist = () => {
     try {
       const token = localStorage.getItem('authToken');
       
-      const response = await fetch(`${API_ENDPOINTS.API}/cart/add', {
+      const response = await fetch(`${API_ENDPOINTS.API}/cart/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -109,7 +109,7 @@ const Profile = () => {
   const fetchMembership = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`${API_ENDPOINTS.API}/memberships/my-membership', {
+      const response = await fetch(`${API_ENDPOINTS.API}/memberships/my-membership`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

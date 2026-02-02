@@ -445,7 +445,23 @@ class ProductController {
         });
       }
 
-      const searchTerm = `%${q.trim()}%`;
+      // Minimum 2 characters for search
+      if (q.trim().length < 2) {
+        return res.json({
+          success: true,
+          message: 'Please enter at least 2 characters',
+          data: [],
+          total: 0
+        });
+      }
+
+      const searchTerm = q.trim().toLowerCase();
+      const searchPattern = `%${searchTerm}%`;
+      
+      // Fuzzy search: Create variations for common typos
+      // Remove vowels for fuzzy matching (shirt -> shrt, sirt -> shrt)
+      const fuzzyTerm = searchTerm.replace(/[aeiou]/gi, '');
+      const fuzzyPattern = `%${fuzzyTerm}%`;
       
       const query = `
         SELECT 
@@ -462,34 +478,37 @@ class ProductController {
           p.images,
           p.created_at,
           c.name as category_name,
-          s.name as subcategory_name
+          s.name as subcategory_name,
+          CASE 
+            WHEN LOWER(p.product_name) LIKE ? THEN 1
+            WHEN LOWER(p.product_name) LIKE ? THEN 2
+            WHEN LOWER(p.tags) LIKE ? THEN 3
+            WHEN LOWER(c.name) LIKE ? THEN 4
+            WHEN LOWER(s.name) LIKE ? THEN 5
+            WHEN LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(p.product_name, 'a', ''), 'e', ''), 'i', ''), 'o', ''), 'u', '')) LIKE ? THEN 6
+            ELSE 7
+          END as relevance
         FROM products p
         LEFT JOIN categories c ON p.category_id = c.category_id
         LEFT JOIN subcategories s ON p.subcategory_id = s.subcategory_id
         WHERE (
-          p.product_name LIKE ? OR 
-          p.fabric LIKE ? OR 
-          p.tags LIKE ? OR 
-          p.colour LIKE ? OR 
-          p.type LIKE ? OR
-          c.name LIKE ? OR
-          s.name LIKE ?
+          LOWER(p.product_name) LIKE ? OR 
+          LOWER(p.fabric) LIKE ? OR 
+          LOWER(p.tags) LIKE ? OR 
+          LOWER(p.colour) LIKE ? OR 
+          LOWER(p.type) LIKE ? OR
+          LOWER(c.name) LIKE ? OR
+          LOWER(s.name) LIKE ? OR
+          LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(p.product_name, 'a', ''), 'e', ''), 'i', ''), 'o', ''), 'u', '')) LIKE ?
         )
         AND p.quantity > 0
-        ORDER BY 
-          CASE 
-            WHEN p.product_name LIKE ? THEN 1
-            WHEN p.tags LIKE ? THEN 2
-            WHEN c.name LIKE ? THEN 3
-            ELSE 4
-          END,
-          p.created_at DESC
+        ORDER BY relevance, p.created_at DESC
         LIMIT 50
       `;
 
       const [products] = await connection.execute(query, [
-        searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm,
-        searchTerm, searchTerm, searchTerm
+        searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, fuzzyPattern,
+        searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, fuzzyPattern
       ]);
 
       const processedProducts = products.map(product => ({
