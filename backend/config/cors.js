@@ -7,9 +7,11 @@
 const getAllowedOrigins = () => {
   const origins = [];
   
-  // Always allow the configured frontend URL
+  // Always allow the configured frontend URL (with and without trailing slash)
   if (process.env.FRONTEND_URL) {
-    origins.push(process.env.FRONTEND_URL);
+    const url = process.env.FRONTEND_URL.replace(/\/$/, ''); // Remove trailing slash
+    origins.push(url);
+    origins.push(url + '/'); // Also allow with trailing slash
   }
   
   // In development, allow localhost variants
