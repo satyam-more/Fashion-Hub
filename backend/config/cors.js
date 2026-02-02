@@ -35,11 +35,20 @@ const corsOptions = {
       return callback(null, true);
     }
     
-    // Check if origin is allowed
-    if (allowedOrigins.includes(origin)) {
+    // Normalize origin by removing trailing slash for comparison
+    const normalizedOrigin = origin.replace(/\/$/, '');
+    
+    // Check if origin is allowed (compare normalized versions)
+    const isAllowed = allowedOrigins.some(allowed => {
+      const normalizedAllowed = allowed.replace(/\/$/, '');
+      return normalizedAllowed === normalizedOrigin;
+    });
+    
+    if (isAllowed) {
       callback(null, true);
     } else {
       console.warn(`⚠️  CORS blocked request from origin: ${origin}`);
+      console.warn(`   Allowed origins: ${allowedOrigins.join(', ')}`);
       callback(new Error(`Origin ${origin} not allowed by CORS policy`));
     }
   },
@@ -78,6 +87,7 @@ const logCorsConfig = () => {
   const allowedOrigins = getAllowedOrigins();
   console.log('\n🌐 CORS Configuration:');
   console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`   FRONTEND_URL env var: "${process.env.FRONTEND_URL}"`);
   console.log(`   Allowed Origins:`);
   allowedOrigins.forEach(origin => {
     console.log(`   - ${origin}`);
