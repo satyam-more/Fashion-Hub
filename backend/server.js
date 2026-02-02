@@ -22,6 +22,9 @@ const { logSecurityStatus } = require('./config/dbSecurity');
 
 const app = express();
 
+// Trust proxy - Required for Render and other reverse proxies
+app.set('trust proxy', 1);
+
 // HTTPS redirect (must be before other middleware)
 app.use(httpsRedirect);
 app.use(hsts);
@@ -61,43 +64,51 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Serve static files (uploaded images)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// MySQL connection with promise support
-const createConnection = async () => {
+// MySQL connection pool with promise support
+const createConnectionPool = async () => {
   try {
-    const connectionConfig = {
+    const poolConfig = {
       host: process.env.DB_HOST,
       port: process.env.DB_PORT || 3306,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      connectTimeout: 20000, // 20 seconds timeout
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+      connectTimeout: 20000,
       enableKeepAlive: true,
       keepAliveInitialDelay: 0
     };
 
     // Add SSL for Aiven cloud database
     if (process.env.DB_HOST && process.env.DB_HOST.includes('aivencloud.com')) {
-      connectionConfig.ssl = {
+      poolConfig.ssl = {
         rejectUnauthorized: false
       };
       console.log('🔒 SSL enabled for Aiven connection');
     }
 
-    const con = await mysql.createConnection(connectionConfig);
+    const pool = mysql.createPool(poolConfig);
+    
+    // Test the connection
+    const connection = await pool.getConnection();
     console.log("✅ Connected to MySQL database");
     console.log(`📍 Database: ${process.env.DB_HOST}:${process.env.DB_PORT || 3306}`);
+    connection.release();
+    
     logSecurityStatus(); // Log database security status
-    return con;
+    return pool;
   } catch (err) {
     console.error("❌ Database connection failed:", err);
     throw err;
   }
 };
 
-// Initialize connection and start server
+// Initialize connection pool and start server
 const startServer = async () => {
   try {
-    const con = await createConnection();
+    const pool = await createConnectionPool();
     
     // Import rate limiters
     const { 
@@ -109,20 +120,20 @@ const startServer = async () => {
       adminDashboardLimiter
     } = require('./middleware/rateLimiter');
     
-    // Import routes and pass the connection
-    const healthRouter = require("./routes/health")(con);
-    const authRouter = require("./routes/auth")(con);
-    const otpRouter = require("./routes/otp")(con);
-    const productRouter = require("./routes/products")(con);
+    // Import routes and pass the connection pool
+    const healthRouter = require("./routes/health")(pool);
+    const authRouter = require("./routes/auth")(pool);
+    const otpRouter = require("./routes/otp")(pool);
+    const productRouter = require("./routes/products")(pool);
     const uploadRouter = require("./routes/upload")();
-    const cartRouter = require("./routes/cart")(con);
-    const ordersRouter = require("./routes/orders")(con);
-    const wishlistRouter = require("./routes/wishlist")(con);
-    const profileRouter = require("./routes/profile")(con);
-    const reviewsRouter = require("./routes/reviews")(con);
+    const cartRouter = require("./routes/cart")(pool);
+    const ordersRouter = require("./routes/orders")(pool);
+    const wishlistRouter = require("./routes/wishlist")(pool);
+    const profileRouter = require("./routes/profile")(pool);
+    const reviewsRouter = require("./routes/reviews")(pool);
     const adminRouter = require("./routes/admin");
     const emailTestRouter = require("./routes/email-test")();
-    const upiRouter = require("./routes/upi")(con);
+    const upiRouter = require("./routes/upi")(pool);
     const customRouter = require("./routes/custom");
     const membershipsRouter = require("./routes/memberships");
     
