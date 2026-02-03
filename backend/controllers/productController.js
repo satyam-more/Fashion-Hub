@@ -5,25 +5,8 @@ class ProductController {
   static fixImageUrls(images) {
     if (!images || !Array.isArray(images)) return [];
     
-    const backendUrl = process.env.BACKEND_URL || 'https://fashion-hub-backend-o7bo.onrender.com';
-    
-    // Placeholder image for missing images
-    const placeholderImage = 'https://via.placeholder.com/400x500/FF8C00/FFFFFF?text=Fashion+Hub';
-    
-    return images.map(img => {
-      // If no image, return placeholder
-      if (!img) return placeholderImage;
-      
-      // If image URL contains localhost, replace it with placeholder (images don't exist on Render)
-      if (img && img.includes('localhost')) {
-        return placeholderImage;
-      }
-      // If image URL is relative, return placeholder (images don't exist on Render)
-      if (img && !img.startsWith('http')) {
-        return placeholderImage;
-      }
-      return img;
-    });
+    // Just return the images as-is since they're now Cloudinary URLs
+    return images.filter(img => img && img.trim() !== '');
   }
   
   // Get all products with category and subcategory details
