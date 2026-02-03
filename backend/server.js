@@ -20,6 +20,9 @@ const { httpsRedirect, hsts, logHttpsConfig } = require('./middleware/httpsRedir
 // Import database security
 const { logSecurityStatus } = require('./config/dbSecurity');
 
+// Import keep-alive utility
+const { startKeepAlive } = require('./utils/keepAlive');
+
 const app = express();
 
 // Trust proxy - Required for Render and other reverse proxies
@@ -104,9 +107,6 @@ const createConnectionPool = async () => {
     throw err;
   }
 };
-
-// Import keep-alive utility
-const { startKeepAlive } = require('./utils/keepAlive');
 
 // Initialize connection pool and start server
 const startServer = async () => {
