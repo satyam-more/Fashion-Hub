@@ -1,6 +1,25 @@
 // Product Controller - handles all product-related business logic
 class ProductController {
   
+  // Helper function to fix image URLs for production
+  static fixImageUrls(images) {
+    if (!images || !Array.isArray(images)) return [];
+    
+    const backendUrl = process.env.BACKEND_URL || 'https://fashion-hub-backend-o7bo.onrender.com';
+    
+    return images.map(img => {
+      // If image URL contains localhost, replace it with production URL
+      if (img && img.includes('localhost')) {
+        return img.replace(/http:\/\/localhost:\d+/, backendUrl);
+      }
+      // If image URL is relative, make it absolute
+      if (img && !img.startsWith('http')) {
+        return `${backendUrl}${img.startsWith('/') ? '' : '/'}${img}`;
+      }
+      return img;
+    });
+  }
+  
   // Get all products with category and subcategory details
   static async getAllProducts(req, res) {
     try {
@@ -47,7 +66,7 @@ class ProductController {
         sizes: product.sizes ? product.sizes.split(',') : [],
         color: product.colour,
         tags: product.tags ? product.tags.split(',') : [],
-        images: product.images ? JSON.parse(product.images) : [],
+        images: ProductController.fixImageUrls(product.images ? JSON.parse(product.images) : []),
         createdAt: product.created_at,
         updatedAt: product.created_at
       }));
@@ -110,7 +129,7 @@ class ProductController {
         sizes: product.sizes ? product.sizes.split(',') : [],
         color: product.colour,
         tags: product.tags ? product.tags.split(',') : [],
-        images: product.images ? JSON.parse(product.images) : [],
+        images: ProductController.fixImageUrls(product.images ? JSON.parse(product.images) : []),
         createdAt: product.created_at
       };
       
@@ -527,8 +546,8 @@ class ProductController {
         sizes: product.sizes ? product.sizes.split(',') : [],
         color: product.colour,
         tags: product.tags ? product.tags.split(',') : [],
-        images: product.images ? JSON.parse(product.images) : [],
-        image_url: product.images ? JSON.parse(product.images)[0] : null,
+        images: ProductController.fixImageUrls(product.images ? JSON.parse(product.images) : []),
+        image_url: ProductController.fixImageUrls(product.images ? [JSON.parse(product.images)[0]] : [])[0] || null,
         createdAt: product.created_at,
         updatedAt: product.created_at
       }));
@@ -632,7 +651,7 @@ class ProductController {
         sizes: product.sizes ? product.sizes.split(',') : [],
         color: product.colour,
         tags: product.tags ? product.tags.split(',') : [],
-        images: product.images ? JSON.parse(product.images) : [],
+        images: ProductController.fixImageUrls(product.images ? JSON.parse(product.images) : []),
         createdAt: product.created_at,
         updatedAt: product.created_at
       }));

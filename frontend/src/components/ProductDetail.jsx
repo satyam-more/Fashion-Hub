@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import StarRating from './StarRating';
 import Footer from './Footer';
+import { API_ENDPOINTS } from '../config/api';
 import '../styles/components/ProductDetail.css';
 import '../styles/components/StarRating.css';
 
