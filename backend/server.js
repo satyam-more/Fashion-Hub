@@ -105,6 +105,9 @@ const createConnectionPool = async () => {
   }
 };
 
+// Import keep-alive utility
+const { startKeepAlive } = require('./utils/keepAlive');
+
 // Initialize connection pool and start server
 const startServer = async () => {
   try {
@@ -179,6 +182,9 @@ const startServer = async () => {
         port: PORT, 
         environment: process.env.NODE_ENV || 'development' 
       });
+      
+      // Start keep-alive service (only in production if enabled)
+      startKeepAlive();
     });
   } catch (error) {
     console.error("Failed to start server:", error);
