@@ -218,9 +218,9 @@ module.exports = (con) => {
         [userId]
       );
 
-      // Get total spent
+      // Get total spent (excluding pending payment status)
       const [totalSpent] = await con.execute(
-        'SELECT COALESCE(SUM(total_amount), 0) as total FROM orders WHERE user_id = ? AND status != "cancelled"',
+        'SELECT COALESCE(SUM(total_amount), 0) as total FROM orders WHERE user_id = ? AND payment_status = "paid"',
         [userId]
       );
 

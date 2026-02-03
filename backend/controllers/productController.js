@@ -7,14 +7,20 @@ class ProductController {
     
     const backendUrl = process.env.BACKEND_URL || 'https://fashion-hub-backend-o7bo.onrender.com';
     
+    // Placeholder image for missing images
+    const placeholderImage = 'https://via.placeholder.com/400x500/FF8C00/FFFFFF?text=Fashion+Hub';
+    
     return images.map(img => {
-      // If image URL contains localhost, replace it with production URL
+      // If no image, return placeholder
+      if (!img) return placeholderImage;
+      
+      // If image URL contains localhost, replace it with placeholder (images don't exist on Render)
       if (img && img.includes('localhost')) {
-        return img.replace(/http:\/\/localhost:\d+/, backendUrl);
+        return placeholderImage;
       }
-      // If image URL is relative, make it absolute
+      // If image URL is relative, return placeholder (images don't exist on Render)
       if (img && !img.startsWith('http')) {
-        return `${backendUrl}${img.startsWith('/') ? '' : '/'}${img}`;
+        return placeholderImage;
       }
       return img;
     });
