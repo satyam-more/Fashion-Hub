@@ -213,56 +213,59 @@ module.exports = (con) => {
           );
         }
 
-        // Send order confirmation email
+        // Send order confirmation email (non-blocking)
         if (process.env.EMAIL_ENABLED === 'true') {
-          try {
-            // Get user details for email
-            const [userDetails] = await connection.execute(
-              'SELECT username, email FROM users WHERE id = ?',
-              [userId]
-            );
+          // Send email asynchronously without blocking the response
+          setImmediate(async () => {
+            try {
+              // Get user details for email
+              const [userDetails] = await con.execute(
+                'SELECT username, email FROM users WHERE id = ?',
+                [userId]
+              );
 
-            if (userDetails.length > 0) {
-              const user = userDetails[0];
-              const emailService = require('../services/emailService');
-              
-              // Get product names for items
-              const itemsWithNames = [];
-              for (let item of items) {
-                const [productDetails] = await connection.execute(
-                  'SELECT product_name FROM products WHERE product_id = ?',
-                  [item.product_id]
-                );
+              if (userDetails.length > 0) {
+                const user = userDetails[0];
+                const emailService = require('../services/emailService');
                 
-                itemsWithNames.push({
-                  product_name: productDetails[0]?.product_name || 'Product',
-                  quantity: item.quantity,
-                  price: parseFloat(item.price).toLocaleString(),
-                  size: item.size || 'M',
-                  color: 'N/A',
-                  image: 'https://via.placeholder.com/300x300/d97706/ffffff?text=' + encodeURIComponent((productDetails[0]?.product_name || 'Product').substring(0, 10))
+                // Get product names for items
+                const itemsWithNames = [];
+                for (let item of items) {
+                  const [productDetails] = await con.execute(
+                    'SELECT product_name FROM products WHERE product_id = ?',
+                    [item.product_id]
+                  );
+                  
+                  itemsWithNames.push({
+                    product_name: productDetails[0]?.product_name || 'Product',
+                    quantity: item.quantity,
+                    price: parseFloat(item.price).toLocaleString(),
+                    size: item.size || 'M',
+                    color: 'N/A',
+                    image: 'https://via.placeholder.com/300x300/d97706/ffffff?text=' + encodeURIComponent((productDetails[0]?.product_name || 'Product').substring(0, 10))
+                  });
+                }
+                
+                await emailService.sendOrderConfirmationEmail({
+                  customerName: user.username,
+                  customerEmail: user.email,
+                  orderId: orderNumber,
+                  totalAmount: parseFloat(total_amount),
+                  paymentMethod: payment_method === 'cod' ? 'Cash on Delivery' : 
+                                payment_method === 'upi' || payment_method === 'upi_direct' ? 'UPI Payment' : 
+                                payment_method || 'COD',
+                  estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+                  shippingAddress: shipping_address,
+                  items: itemsWithNames
                 });
+                
+                console.log(`✅ Order confirmation email sent to ${user.email}`);
               }
-              
-              await emailService.sendOrderConfirmationEmail({
-                customerName: user.username,
-                customerEmail: user.email,
-                orderId: orderNumber,
-                totalAmount: parseFloat(total_amount),
-                paymentMethod: payment_method === 'cod' ? 'Cash on Delivery' : 
-                              payment_method === 'upi' || payment_method === 'upi_direct' ? 'UPI Payment' : 
-                              payment_method || 'COD',
-                estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-                shippingAddress: shipping_address,
-                items: itemsWithNames
-              });
-              
-              console.log(`✅ Order confirmation email sent to ${user.email}`);
+            } catch (emailError) {
+              console.error('Failed to send order confirmation email:', emailError.message);
+              // Email failure doesn't affect order creation
             }
-          } catch (emailError) {
-            console.error('Failed to send order confirmation email:', emailError.message);
-            // Don't fail order creation if email fails
-          }
+          });
         }
 
         await connection.commit();
@@ -464,47 +467,52 @@ module.exports = (con) => {
           images: item.images ? JSON.parse(item.images) : []
         }));
 
-        // Send order confirmation email
+        // Send order confirmation email (non-blocking)
         if (process.env.EMAIL_ENABLED === 'true') {
-          try {
-            // Get user details for email
-            const [userDetails] = await connection.execute(
-              'SELECT username, email FROM users WHERE id = ?',
-              [userId]
-            );
+          // Send email asynchronously without blocking the response
+          setImmediate(async () => {
+            try {
+              // Get user details for email
+              const [userDetails] = await con.execute(
+                'SELECT username, email FROM users WHERE id = ?',
+                [userId]
+              );
 
-            if (userDetails.length > 0) {
-              const user = userDetails[0];
-              const emailService = require('../services/emailService');
-              
-              await emailService.sendOrderConfirmationEmail({
-                customerName: user.username,
-                customerEmail: user.email,
-                orderId: orderNumber,
-                totalAmount: calculatedTotal,
-                paymentMethod: payment_method || 'COD',
-                estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-                shippingAddress: shipping_address,
-                items: orderItems.map(item => {
-                  let imageUrl = null;
-                  // For now, let's use a placeholder image to test the email template
-                  // You can replace this with actual product images later
-                  imageUrl = 'https://via.placeholder.com/300x300/d97706/ffffff?text=' + encodeURIComponent(item.product_name.substring(0, 10));
-                  return {
-                    product_name: item.product_name,
-                    quantity: item.quantity,
-                    price: item.total.toLocaleString(),
-                    size: item.size,
-                    color: item.colour,
-                    image: imageUrl
-                  };
-                })
-              });
+              if (userDetails.length > 0) {
+                const user = userDetails[0];
+                const emailService = require('../services/emailService');
+                
+                await emailService.sendOrderConfirmationEmail({
+                  customerName: user.username,
+                  customerEmail: user.email,
+                  orderId: orderNumber,
+                  totalAmount: calculatedTotal,
+                  paymentMethod: payment_method || 'COD',
+                  estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+                  shippingAddress: shipping_address,
+                  items: orderItems.map(item => {
+                    let imageUrl = null;
+                    // For now, let's use a placeholder image to test the email template
+                    // You can replace this with actual product images later
+                    imageUrl = 'https://via.placeholder.com/300x300/d97706/ffffff?text=' + encodeURIComponent(item.product_name.substring(0, 10));
+                    return {
+                      product_name: item.product_name,
+                      quantity: item.quantity,
+                      price: item.total.toLocaleString(),
+                      size: item.size,
+                      color: item.colour,
+                      image: imageUrl
+                    };
+                  })
+                });
+                
+                console.log(`✅ Order confirmation email sent to ${user.email}`);
+              }
+            } catch (emailError) {
+              console.error('Failed to send order confirmation email:', emailError.message);
+              // Email failure doesn't affect order creation
             }
-          } catch (emailError) {
-            console.error('Failed to send order confirmation email:', emailError.message);
-            // Don't fail order creation if email fails
-          }
+          });
         }
 
         await connection.commit();
