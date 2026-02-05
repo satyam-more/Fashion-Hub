@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { API_ENDPOINTS } from '../config/api';
 import '../styles/auth/Login.css';
 
 const ForgotPassword = () => {

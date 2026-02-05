@@ -13,6 +13,7 @@ import {
   ArcElement,
 } from 'chart.js';
 import AdminLayout from './AdminLayout';
+import { API_ENDPOINTS } from '../../config/api';
 import '../../styles/admin/SalesAnalytics.css';
 
 // Register Chart.js components

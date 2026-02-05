@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../Navbar';
+import { API_ENDPOINTS } from '../../config/api';
 import '../../styles/user/Profile.css';
 
 const Profile = () => {

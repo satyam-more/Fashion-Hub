@@ -14,6 +14,7 @@ import {
   RadialLinearScale,
 } from 'chart.js';
 import AdminLayout from './AdminLayout';
+import { API_ENDPOINTS } from '../../config/api';
 import '../../styles/admin/ConsultationAnalytics.css';
 
 // Register Chart.js components

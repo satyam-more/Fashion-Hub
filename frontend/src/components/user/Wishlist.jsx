@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../Navbar';
 import Footer from '../Footer';
+import { API_ENDPOINTS } from '../../config/api';
 import '../../styles/user/Wishlist.css';
 
 const Wishlist = () => {

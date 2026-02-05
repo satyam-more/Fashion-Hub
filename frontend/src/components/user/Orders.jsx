@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
+import { API_ENDPOINTS } from '../../config/api';
 import '../../styles/user/Orders.css';
 
 const Orders = () => {
