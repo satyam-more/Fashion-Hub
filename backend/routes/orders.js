@@ -102,6 +102,7 @@ module.exports = (con) => {
 
   // Create new order (direct POST to /orders)
   router.post('/', auth.authenticateToken, async (req, res) => {
+    let connection;
     try {
       const userId = req.user.userId || req.user.id;
       const { 
@@ -148,12 +149,13 @@ module.exports = (con) => {
       // Generate order number
       const orderNumber = 'FH' + Date.now() + Math.random().toString(36).substr(2, 5).toUpperCase();
 
-      // Start transaction
-      await con.beginTransaction();
+      // Get connection from pool for transaction
+      connection = await con.getConnection();
+      await connection.beginTransaction();
 
       try {
         // Create order
-        const [orderResult] = await con.execute(`
+        const [orderResult] = await connection.execute(`
           INSERT INTO orders (
             user_id, 
             order_number, 
@@ -185,7 +187,7 @@ module.exports = (con) => {
         for (let item of items) {
           const itemTotal = parseFloat(item.price) * item.quantity;
           
-          await con.execute(`
+          await connection.execute(`
             INSERT INTO order_items (
               order_id, 
               product_id, 
@@ -205,7 +207,7 @@ module.exports = (con) => {
           ]);
 
           // Update product stock
-          await con.execute(
+          await connection.execute(
             'UPDATE products SET quantity = quantity - ? WHERE product_id = ?',
             [item.quantity, item.product_id]
           );
@@ -215,7 +217,7 @@ module.exports = (con) => {
         if (process.env.EMAIL_ENABLED === 'true') {
           try {
             // Get user details for email
-            const [userDetails] = await con.execute(
+            const [userDetails] = await connection.execute(
               'SELECT username, email FROM users WHERE id = ?',
               [userId]
             );
@@ -227,7 +229,7 @@ module.exports = (con) => {
               // Get product names for items
               const itemsWithNames = [];
               for (let item of items) {
-                const [productDetails] = await con.execute(
+                const [productDetails] = await connection.execute(
                   'SELECT product_name FROM products WHERE product_id = ?',
                   [item.product_id]
                 );
@@ -263,7 +265,7 @@ module.exports = (con) => {
           }
         }
 
-        await con.commit();
+        await connection.commit();
 
         res.json({
           success: true,
@@ -274,8 +276,10 @@ module.exports = (con) => {
           }
         });
       } catch (error) {
-        await con.rollback();
+        await connection.rollback();
         throw error;
+      } finally {
+        if (connection) connection.release();
       }
     } catch (error) {
       console.error('Create order error:', error);
@@ -285,6 +289,7 @@ module.exports = (con) => {
 
   // Create new order from cart
   router.post('/create', auth.authenticateToken, async (req, res) => {
+    let connection;
     try {
       const userId = req.user.userId;
       const { 
@@ -360,14 +365,15 @@ module.exports = (con) => {
       // Generate order number
       const orderNumber = 'FH' + Date.now() + Math.random().toString(36).substr(2, 5).toUpperCase();
 
-      // Start transaction
-      await con.beginTransaction();
+      // Get connection from pool for transaction
+      connection = await con.getConnection();
+      await connection.beginTransaction();
 
       try {
         // Create order - try with new columns first, fallback to basic if they don't exist
         let orderResult;
         try {
-          [orderResult] = await con.execute(`
+          [orderResult] = await connection.execute(`
             INSERT INTO orders (
               user_id, 
               order_number, 
@@ -394,7 +400,7 @@ module.exports = (con) => {
         } catch (columnError) {
           // Fallback to basic order creation if new columns don't exist
           console.log('Using fallback order creation (missing columns):', columnError.message);
-          [orderResult] = await con.execute(`
+          [orderResult] = await connection.execute(`
             INSERT INTO orders (
               user_id, 
               order_number, 
@@ -421,27 +427,27 @@ module.exports = (con) => {
           const itemTotal = parseFloat(item.price) * item.quantity;
           
           // Insert order item
-          await con.execute(`
+          await connection.execute(`
             INSERT INTO order_items (order_id, product_id, quantity, size, price, total)
             VALUES (?, ?, ?, ?, ?, ?)
           `, [orderId, item.product_id, item.quantity, item.size || null, item.price, itemTotal]);
 
           // Update product quantity
-          await con.execute(`
+          await connection.execute(`
             UPDATE products SET quantity = quantity - ? WHERE product_id = ?
           `, [item.quantity, item.product_id]);
         }
 
         // Clear cart
-        await con.execute('DELETE FROM cart WHERE user_id = ?', [userId]);
+        await connection.execute('DELETE FROM cart WHERE user_id = ?', [userId]);
 
         // Get the complete order data to return
-        const [orderData] = await con.execute(`
+        const [orderData] = await connection.execute(`
           SELECT * FROM orders WHERE order_id = ?
         `, [orderId]);
 
         // Get order items with product details
-        const [orderItems] = await con.execute(`
+        const [orderItems] = await connection.execute(`
           SELECT 
             oi.*,
             p.product_name,
@@ -462,7 +468,7 @@ module.exports = (con) => {
         if (process.env.EMAIL_ENABLED === 'true') {
           try {
             // Get user details for email
-            const [userDetails] = await con.execute(
+            const [userDetails] = await connection.execute(
               'SELECT username, email FROM users WHERE id = ?',
               [userId]
             );
@@ -501,7 +507,7 @@ module.exports = (con) => {
           }
         }
 
-        await con.commit();
+        await connection.commit();
 
         res.json({
           success: true,
@@ -513,8 +519,10 @@ module.exports = (con) => {
           }
         });
       } catch (error) {
-        await con.rollback();
+        await connection.rollback();
         throw error;
+      } finally {
+        if (connection) connection.release();
       }
     } catch (error) {
       console.error('Create order error:', error);
@@ -524,6 +532,7 @@ module.exports = (con) => {
 
   // Cancel order (only if status is pending)
   router.put('/cancel/:orderId', auth.authenticateToken, async (req, res) => {
+    let connection;
     try {
       const userId = req.user.userId;
       const { orderId } = req.params;
@@ -545,33 +554,36 @@ module.exports = (con) => {
         });
       }
 
-      // Start transaction
-      await con.beginTransaction();
+      // Get connection from pool for transaction
+      connection = await con.getConnection();
+      await connection.beginTransaction();
 
       try {
         // Get order items to restore product quantities
-        const [orderItems] = await con.execute(`
+        const [orderItems] = await connection.execute(`
           SELECT product_id, quantity FROM order_items WHERE order_id = ?
         `, [orderId]);
 
         // Restore product quantities
         for (let item of orderItems) {
-          await con.execute(`
+          await connection.execute(`
             UPDATE products SET quantity = quantity + ? WHERE product_id = ?
           `, [item.quantity, item.product_id]);
         }
 
         // Update order status
-        await con.execute(`
+        await connection.execute(`
           UPDATE orders SET status = 'cancelled' WHERE order_id = ?
         `, [orderId]);
 
-        await con.commit();
+        await connection.commit();
 
         res.json({ success: true, message: 'Order cancelled successfully' });
       } catch (error) {
-        await con.rollback();
+        await connection.rollback();
         throw error;
+      } finally {
+        if (connection) connection.release();
       }
     } catch (error) {
       console.error('Cancel order error:', error);
