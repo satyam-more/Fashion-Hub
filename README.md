@@ -191,99 +191,119 @@ Fashion Hub is a comprehensive e-commerce platform designed for fashion retail, 
 
 ---
 
-## 🚀 Installation & Setup
+## 🚀 Getting Started (Download & Run)
+
+This guide walks a new user through downloading the project from GitHub and running it locally from scratch.
 
 ### Prerequisites
-- Node.js (v14 or higher)
-- MySQL (v8.0 or higher)
-- npm or yarn package manager
 
-### Backend Setup
+Make sure the following are installed on your machine:
 
-1. **Navigate to backend directory:**
+- **Node.js** v14 or higher ([download](https://nodejs.org/)) — includes `npm`
+- **MySQL** v8.0 or higher ([download](https://dev.mysql.com/downloads/)) — or any MySQL-compatible server
+- **Git** ([download](https://git-scm.com/downloads))
+- A MySQL client to import the database, such as the `mysql` CLI, [MySQL Workbench](https://dev.mysql.com/downloads/workbench/), or [phpMyAdmin](https://www.phpmyadmin.net/)
+
+### Step 1 — Clone the repository
+
 ```bash
-cd backend
+git clone https://github.com/satyam-more/Fashion-Hub.git
+cd Fashion-Hub
 ```
 
-2. **Install dependencies:**
+### Step 2 — Import the database
+
+The complete database schema and sample data is included in the repository as **`latestdb.sql`** (located in the project root). This is a standard SQL dump that creates all tables and seeds sample users, products, orders, reviews, and appointments.
+
+1. Create a database (name it whatever you like, e.g. `fashion_hub`):
+
 ```bash
+mysql -u root -p -e "CREATE DATABASE fashion_hub;"
+```
+
+2. Import the dump into that database:
+
+```bash
+mysql -u root -p fashion_hub < latestdb.sql
+```
+
+> **Note:** The dump file contains a `USE \`defaultdb\`;` line from the original hosting environment. When you import it into your own database using the command above, MySQL loads the tables into `fashion_hub`. If you import via phpMyAdmin/Workbench, create and select your target database first, then remove or ignore the `USE \`defaultdb\`;` line before running the script.
+
+### Step 3 — Configure and run the backend
+
+```bash
+cd backend
 npm install
 ```
 
-3. **Configure environment variables:**
-Create a `.env` file in the backend directory:
+Create a `.env` file in the `backend/` directory. You can copy the provided template and edit the values:
+
+```bash
+cp .env.example .env
+```
+
+Set at least these values in `backend/.env`:
+
 ```env
+# Database
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=your_password
+DB_PASSWORD=your_database_password
 DB_NAME=fashion_hub
+
+# Server
 PORT=5000
-JWT_SECRET=your_jwt_secret_key
 FRONTEND_URL=http://localhost:5173
 
-# Email Configuration
+# Auth
+JWT_SECRET=change_this_to_a_long_random_secret
+
+# Email (optional for local testing; required for order/OTP emails)
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_app_password
+EMAIL_PASS=your_app_specific_password
 EMAIL_FROM=your_email@gmail.com
 EMAIL_FROM_NAME=Fashion Hub
+EMAIL_ENABLED=false
+
+NODE_ENV=development
 ```
 
-4. **Create database:**
+Start the backend:
+
 ```bash
-mysql -u root -p
-CREATE DATABASE fashion_hub;
-USE fashion_hub;
-SOURCE database.sql;
+npm start
+# or during development (auto-reload): npm run dev
 ```
 
-5. **Run migrations (if needed):**
-```bash
-node migrations/add-user-contact-fields.sql
-```
+The API runs at `http://localhost:5000`.
 
-6. **Insert sample data:**
-```bash
-# Insert sample users
-node insert-sample-users.js
+### Step 4 — Configure and run the frontend
 
-# Insert sample products
-node insert-sample-products.js
+Open a **new terminal** in the project root:
 
-# Insert sample orders
-node insert-sample-orders.js
-
-# Insert sample reviews
-node insert-product-reviews.js
-
-# Insert sample consultations
-node insert-sample-consultations.js
-```
-
-7. **Start backend server:**
-```bash
-node server.js
-```
-Server will run on `http://localhost:5000`
-
-### Frontend Setup
-
-1. **Navigate to frontend directory:**
 ```bash
 cd frontend
-```
-
-2. **Install dependencies:**
-```bash
 npm install
-```
-
-3. **Start development server:**
-```bash
 npm run dev
 ```
-Frontend will run on `http://localhost:5173`
+
+The app runs at `http://localhost:5173`. Open that URL in your browser.
+
+### Step 5 — Log in
+
+Use the default admin account (see [Default Admin Credentials](#-default-admin-credentials)) or register a new customer account from the app.
+
+---
+
+## 🚀 Installation Reference (Summary)
+
+| Component | Directory | Install | Run | URL |
+|-----------|-----------|---------|-----|-----|
+| Database  | project root | import `latestdb.sql` | — | — |
+| Backend   | `backend/` | `npm install` | `npm start` | http://localhost:5000 |
+| Frontend  | `frontend/` | `npm install` | `npm run dev` | http://localhost:5173 |
 
 ---
 
@@ -321,8 +341,7 @@ Fashion-Hub/
 │   ├── services/
 │   │   └── emailService.js
 │   ├── uploads/
-│   ├── .env
-│   ├── database.sql
+│   ├── .env.example
 │   ├── package.json
 │   └── server.js
 │
@@ -361,9 +380,9 @@ Fashion-Hub/
 │   ├── package.json
 │   └── vite.config.js
 │
-├── CATEGORIES_ANALYSIS.md
-├── PRODUCTS_ANALYSIS.md
-├── TABLES_ANALYSIS.md
+├── latestdb.sql          # Full database schema + sample data (import this)
+├── COMPLETE_DEPLOYMENT_GUIDE.md
+├── RENDER_DEPLOYMENT_STEPS.md
 └── README.md
 ```
 
@@ -550,7 +569,7 @@ node backend/fix-payment-methods.js
 
 For queries or support:
 - **Email:** satyammore2020@gmail.com
-- **Project Repository:** [GitHub Link]
+- **Project Repository:** https://github.com/satyam-more/Fashion-Hub
 
 ---
 
